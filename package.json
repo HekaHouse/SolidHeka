@@ -1,0 +1,25 @@
+{
+  "name": "solidheka",
+  "version": "1.0.0",
+  "description": "Solid app for Heka House",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HekaHouse/SolidHeka.git"
+  },
+  "author": "Aron Price",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HekaHouse/SolidHeka/issues"
+  },
+  "homepage": "https://github.com/HekaHouse/SolidHeka#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "greenlock": "^2.1.14",
+    "greenlock-express": "^2.0.10",
+    "ursa": "^0.9.4"
+  }
+}
