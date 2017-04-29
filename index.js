@@ -5,8 +5,9 @@ var solid = require('solid-server');
 var wildcardSubdomains = require('wildcard-subdomains');
 var cors = require('cors');
 var bodyParser = require('body-parser');
-var multer  = require('multer');
-var upload = multer({ dest: 'uploads/' });
+var multer = require('multer');
+var storage  = multer.memoryStorage();
+var upload = multer({ storage });
 
 var settings = {
   cache: 0, // Set cache time (in seconds), 0 for no cache
@@ -23,7 +24,13 @@ var settings = {
   errorPages: false // specify a path where the error pages are
 };
 
+var config = {
+  projectId: 'heka-house-df9b8',
+  keyFilename: '../api/HekaHouse-storage.json'
+};
 
+var storage = require('@google-cloud/storage')(config);
+var bucket = storage.bucket('solid-user-content');
 
 var admin = require("firebase-admin");
 
@@ -35,7 +42,6 @@ admin.initializeApp({
 });
 
 var database = admin.database();
-var storage = admin.storage();
 
 var privateKey  = fs.readFileSync('../ssl/heka.house.key', 'utf8');
 var certificate = fs.readFileSync('../ssl/heka.house.crt', 'utf8');
@@ -108,24 +114,52 @@ app.post('/s/*/,system/newAccount', function (req, res) {
   returnRef(ref,res);
 });
 
-app.post('/s/*/profile', upload.single('avatar'), function (req, res) {
+app.post('/s/*/profile', upload.single('File'), function (req, res) {
   var username = req.hostname.replace('.heka.house','');
+  console.log('profiling-user',username);
+
   var fullname = req.body.name;
+  console.log('profiling-full',fullname);
   var avatar = req.file;
   var userRef = database.ref('/users').child(username);
-  var avatarRef = storage.ref().child('user-content/images/'+username+'/profile');
   if (fullname) {
     userRef.child('fullname').set(fullname);
+  } else {
+    console.log(JSON.stringify(req.params));
   }
   if (avatar) {
-    avatarRef.put(avatar.buffer).then(function(snapshot) {
-      console.log('Uploaded a profile!');
-      avatarRef.getDownloadURL().then(function(url) {
-        userRef.child('avatar').set(url); 
-        returnRef(userRef,res);  
-      });
-    });  
+    console.log('uploading image',avatar.originalname);
+    var remoteFile = bucket.file('images/'+username+'/'+avatar.originalname);
+	ws = remoteFile.createWriteStream({ resumable: false,
+					    metadata: {
+				              contentType: avatar.mimetype }});
+	ws.on('finish', function () {
+	  console.log('uploading success',avatar.originalname);
+	const action = 'read';
+	const expires = '03-09-2491';
+	  remoteFile.getSignedUrl({action, expires}).then(signedUrls => {
+  	    userRef.child('avatar').set(signedUrls[0]);	    
+            returnRef(userRef,res);
+		  // signedUrls[0] contains the file's public URL
+	  });
+	});
+	ws.on('error', function (e) {
+	  console.log('uploading fail');
+	  bucket.exists(function(err,exists) {
+		if (err) {
+		  console.log('error',err);
+		} else {
+		  console.log('bucket exists',exists);
+		}
+	    console.log('uploading fail',JSON.stringify(e));
+  	    returnRef(userRef,res);
+	  });
+	});
+	console.log('buffer size',avatar.buffer.length);
+	ws.write(avatar.buffer);
+	ws.end();			
   } else {
+    console.log('no avatar',avatar.originalname);
     returnRef(userRef,res);
   }
 });
