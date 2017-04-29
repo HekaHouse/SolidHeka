@@ -184,10 +184,20 @@ app.patch('/s/*/profile/card', function (req, res) {
 });
 
 app.post('/s/*/,system/newCert', function (req, res) {
-        console.log('newCert',JSON.stringify(req.params));
-        console.log('newCert',JSON.stringify(req.body));
-        console.log('newCert',JSON.stringify(req.query));
-        res.sendStatus(200);
+    var username = req.hostname.replace('.heka.house','');
+    var secured = certification.generate(username);
+    var fullname = req.body.name;
+    console.log('profiling-full',fullname);
+    var userRef = database.ref('/users').child(username);
+    if (fullname) {
+      userRef.child('fullname').set(fullname);
+    } else {
+      console.log(JSON.stringify(req.params));
+    }
+    userRef.child('secure/cert').set(secured.cert);
+    userRef.child('secure/keys').set(secured.keys);
+    res.setHeader('content-type','application/x-x509-user-cert');
+    res.status(200).send(secured.cert);
 });
 
 

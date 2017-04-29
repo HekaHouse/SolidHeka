@@ -82,7 +82,9 @@ exports.generate = function(username) {
   // convert a Forge certificate from PEM
   var cert = pki.certificateFromPem(pem);
 
-  return {'keys':keys,'cert'"cert"};
+  var enc_priv = pki.encryptRsaPrivateKey(keys.privateKey, 'password');
+  var pub = pki.publicKeyToPem(keys.publicKey);
+  return {'keys':{'public':pub,'private':enc_priv},'cert':pem};
 }
 
 
