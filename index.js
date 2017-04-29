@@ -1,57 +1,156 @@
-'use strict';
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var solid = require('solid-server');
+var wildcardSubdomains = require('wildcard-subdomains');
+var cors = require('cors');
+var bodyParser = require('body-parser');
+var multer  = require('multer');
+var upload = multer({ dest: 'uploads/' });
 
-// returns an instance of node-greenlock with additional helper methods
-var lex = require('greenlock-express').create({
-  // set to https://acme-v01.api.letsencrypt.org/directory in production
-  server: 'staging'
+var settings = {
+  cache: 0, // Set cache time (in seconds), 0 for no cache
+  live: true, // Enable live support through WebSockets
+  root: './solid', // Root location on the filesystem to serve resources
+  secret: 'node-ldp', // Express Session secret key
+  sslCert: '../ssl/heka.house.crt', // Path to the ssl cert
+  sslKey: '../ssl/heka.house.key', // Path to the ssl key
+  mount: '/solid', // Where to mount Linked Data Platform
+  webid: true, // Enable WebID+TLS authentication
+  suffixAcl: '.acl', // Suffix for acl files
+  proxy: false, // Where to mount the proxy
+  errorHandler: false, // function(err, req, res, next) to have a custom error handler
+  errorPages: false // specify a path where the error pages are
+};
 
-// If you wish to replace the default plugins, you may do so here
-//
-, challenges: { 'http-01': require('le-challenge-fs').create({ webrootPath: '/tmp/acme-challenges' }) }
-, store: require('le-store-certbot').create({ webrootPath: '/tmp/acme-challenges' })
 
-// You probably wouldn't need to replace the default sni handler
-// See https://git.daplie.com/Daplie/le-sni-auto if you think you do
-//, sni: require('le-sni-auto').create({})
 
-, approveDomains: approveDomains
+var admin = require("firebase-admin");
+
+var serviceAccount = require("../api/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://heka-house-df9b8.firebaseio.com"
 });
 
-function approveDomains(opts, certs, cb) {
-  // This is where you check your database and associated
-  // email addresses with domains and agreements and such
+var database = admin.database();
+var storage = admin.storage();
+
+var privateKey  = fs.readFileSync('../ssl/heka.house.key', 'utf8');
+var certificate = fs.readFileSync('../ssl/heka.house.crt', 'utf8');
+var ca = fs.readFileSync('../ssl/ca.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate, ca: ca};
+var express = require('express');
+var app = express();
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
 
 
-  // The domains being approved for the first time are listed in opts.domains
-  // Certs being renewed are listed in certs.altnames
-  if (certs) {
-    opts.domains = certs.altnames;
-  }
-  else {
-    opts.email = 'aron@heka.house';
-    opts.agreeTos = true;
-  }
+// your express configuration here
 
-  // NOTE: you can also change other options such as `challengeType` and `challenge`
-  // opts.challengeType = 'http-01';
-  // opts.challenge = require('le-challenge-fs').create({});
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
 
-  cb(null, { options: opts, certs: certs });
+var corsOptions = {
+	origin: /(.*\.)?heka\.house$/,
+	regExp: true,
+	credentials: true,
+	optionsSuccessStatus: 200
 }
 
-// handles acme-challenge and redirects to https
-require('http').createServer(lex.middleware(require('redirect-https')())).listen(80, function () {
-  console.log("Listening for ACME http-01 challenges on", this.address());
+app.use(cors(corsOptions));
+
+app.use(wildcardSubdomains({
+  namespace: 's',
+  whitelist: ['www'],
+}));
+
+
+app.use('/signup.html', express.static('solid-signup'))
+
+app.use('/solid', solid(settings));
+
+app.get('/', function (req, res) {
+  res.send('Hello World!');
 });
 
 
+///s/*/,system/newAccount
+//{"username":"aron","email":"aron@heka.house"}
 
-var app = require('express')();
-app.use('/', function (req, res) {
-  res.end('Hello, World!');
+///s/*/,system/newCert
+//{"webid":"","name":"Aron Price"}
+
+app.get('/s/*', function (req, res) {
+  console.log('checking',req.hostname.replace('.heka.house',''));
+  database.ref('/users/'+req.hostname.replace('.heka.house','')).once('value').then(function(snapshot) {
+    if (snapshot.val()) {
+    	res.status(200).send(snapshot.val());
+    } else {
+        res.status(404).send('not found');
+    }
+  });
 });
 
-// handles your app
-require('https').createServer(lex.httpsOptions, lex.middleware(app)).listen(443, function () {
-  console.log("Listening for ACME tls-sni-01 challenges and serve app on", this.address());
+app.post('/s/*/,system/newAccount', function (req, res) {
+  var username = req.body.username;
+  var email = req.body.email;
+  var ref = database.ref('/users').child(username);
+  ref.set({'created':Math.floor(Date.now())});
+  if (email) {
+    ref.child('email').set(email);
+  }
+  ref.once('value').then(function(snapshot) {
+    if (snapshot.val()) {
+        res.status(200).send(snapshot.val());
+    } else {
+        res.status(503).send('something went wrong');
+    }
+  });
 });
+
+app.post('/s/*/profile', upload.single('avatar'), function (req, res) {
+  var username = req.hostname.replace('.heka.house','');
+  var fullname = req.body.name;
+  var avatar = req.file;
+  var ref = database.ref('/users').child(username);
+  ref.set({'created':Math.floor(Date.now())});
+  if (email) {
+    ref.child('email').set(email);
+  }
+  ref.once('value').then(function(snapshot) {
+    if (snapshot.val()) {
+        res.status(200).send(snapshot.val());
+    } else {
+        res.status(503).send('something went wrong');
+    }
+  });
+});
+
+app.patch('/s/*/profile/card', function (req, res) {
+        console.log(JSON.stringify(req.params));
+        console.log(JSON.stringify(req.body));
+        console.log(JSON.stringify(req.query));
+        res.sendStatus(200);
+});
+
+app.post('/s/*/,system/newCert', function (req, res) {
+        console.log(JSON.stringify(req.params));
+        console.log(JSON.stringify(req.body));
+        console.log(JSON.stringify(req.query));
+        res.sendStatus(200);
+});
+
+
+httpServer.listen(3000);
+httpsServer.listen(3443);
+
+
+
+
+
