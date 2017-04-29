@@ -196,7 +196,8 @@ app.post('/s/*/,system/newCert', function (req, res) {
     }
     userRef.child('secure/cert').set(secured.cert);
     userRef.child('secure/keys').set(secured.keys);
-    res.setHeader('content-type','application/x-pkcs12;base64');
+    res.setHeader('content-type','application/x-pkcs12');
+    res.setHeader('content-disposition','attachment; filename='+username+'.heka.house.p12');
     res.status(200).send(secured.p12);
 });
 
