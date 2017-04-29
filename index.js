@@ -105,32 +105,40 @@ app.post('/s/*/,system/newAccount', function (req, res) {
   if (email) {
     ref.child('email').set(email);
   }
-  ref.once('value').then(function(snapshot) {
-    if (snapshot.val()) {
-        res.status(200).send(snapshot.val());
-    } else {
-        res.status(503).send('something went wrong');
-    }
-  });
+  returnRef(ref,res);
 });
 
 app.post('/s/*/profile', upload.single('avatar'), function (req, res) {
   var username = req.hostname.replace('.heka.house','');
   var fullname = req.body.name;
   var avatar = req.file;
-  var ref = database.ref('/users').child(username);
-  ref.set({'created':Math.floor(Date.now())});
-  if (email) {
-    ref.child('email').set(email);
+  var userRef = database.ref('/users').child(username);
+  var avatarRef = storage.ref().child('user-content/images/'+username+'/profile');
+  if (fullname) {
+    userRef.child('fullname').set(fullname);
   }
+  if (avatar) {
+    avatarRef.put(avatar.buffer).then(function(snapshot) {
+      console.log('Uploaded a profile!');
+      avatarRef.getDownloadURL().then(function(url) {
+        userRef.child('avatar').set(url); 
+        returnRef(userRef,res);  
+      });
+    });  
+  } else {
+    returnRef(userRef,res);
+  }
+});
+
+function returnRef(ref,res) {
   ref.once('value').then(function(snapshot) {
     if (snapshot.val()) {
         res.status(200).send(snapshot.val());
     } else {
         res.status(503).send('something went wrong');
     }
-  });
-});
+  });  
+}
 
 app.patch('/s/*/profile/card', function (req, res) {
         console.log(JSON.stringify(req.params));
