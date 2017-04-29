@@ -9,6 +9,8 @@ var multer = require('multer');
 var storage  = multer.memoryStorage();
 var upload = multer({ storage });
 
+var certification = require("./certification.js");
+
 var settings = {
   cache: 0, // Set cache time (in seconds), 0 for no cache
   live: true, // Enable live support through WebSockets
@@ -175,16 +177,16 @@ function returnRef(ref,res) {
 }
 
 app.patch('/s/*/profile/card', function (req, res) {
-        console.log(JSON.stringify(req.params));
-        console.log(JSON.stringify(req.body));
-        console.log(JSON.stringify(req.query));
+        console.log('profile/card',JSON.stringify(req.params));
+        console.log('profile/card',JSON.stringify(req.body));
+        console.log('profile/card',JSON.stringify(req.query));
         res.sendStatus(200);
 });
 
 app.post('/s/*/,system/newCert', function (req, res) {
-        console.log(JSON.stringify(req.params));
-        console.log(JSON.stringify(req.body));
-        console.log(JSON.stringify(req.query));
+        console.log('newCert',JSON.stringify(req.params));
+        console.log('newCert',JSON.stringify(req.body));
+        console.log('newCert',JSON.stringify(req.query));
         res.sendStatus(200);
 });
 

@@ -21,6 +21,7 @@
     "express": "^4.15.2",
     "firebase-admin": "^4.2.1",
     "multer": "^1.3.0",
+    "node-forge": "^0.7.1",
     "request": "^2.81.0",
     "solid-client": "^0.24.0",
     "solid-server": "^3.5.0",
