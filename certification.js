@@ -84,7 +84,14 @@ exports.generate = function(username) {
 
   var enc_priv = pki.encryptRsaPrivateKey(keys.privateKey, 'password');
   var pub = pki.publicKeyToPem(keys.publicKey);
-  return {'keys':{'public':pub,'private':enc_priv},'cert':pem};
+  var p12Asn1 = forge.pkcs12.toPkcs12Asn1(
+    keys.privateKey, cert, 'password',
+    {algorithm: '3des'});
+
+  // base64-encode p12
+  var p12Der = forge.asn1.toDer(p12Asn1).getBytes();
+  var p12b64 = forge.util.encode64(p12Der);
+  return {'keys':{'public':pub,'private':enc_priv},'cert':pem, 'p12':p12b64};
 }
 
 

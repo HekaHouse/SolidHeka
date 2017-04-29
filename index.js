@@ -196,8 +196,8 @@ app.post('/s/*/,system/newCert', function (req, res) {
     }
     userRef.child('secure/cert').set(secured.cert);
     userRef.child('secure/keys').set(secured.keys);
-    res.setHeader('content-type','application/x-x509-user-cert');
-    res.status(200).send(secured.cert);
+    res.setHeader('content-type','application/x-pkcs12;base64');
+    res.status(200).send(secured.p12);
 });
 
 
