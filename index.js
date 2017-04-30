@@ -185,7 +185,7 @@ app.patch('/s/*/profile/card', function (req, res) {
 
 app.post('/s/*/,system/newCert', function (req, res) {
     var username = req.hostname.replace('.heka.house','');
-    var secured = certification.generate(username);
+    var cert = req.body.spkac;
     var fullname = req.body.name;
     console.log('profiling-full',fullname);
     var userRef = database.ref('/users').child(username);
@@ -194,11 +194,9 @@ app.post('/s/*/,system/newCert', function (req, res) {
     } else {
       console.log(JSON.stringify(req.params));
     }
-    userRef.child('secure/cert').set(secured.cert);
-    userRef.child('secure/keys').set(secured.keys);
-    res.setHeader('content-type','application/x-pkcs12');
-    res.setHeader('content-disposition','attachment; filename='+username+'.heka.house.p12');
-    res.status(200).send(secured.p12);
+    userRef.child('secure/cert').set(cert);
+    res.setHeader('content-type','application/x-x509-user-cert');    
+    res.status(200).send(secured.cert);
 });
 
 
