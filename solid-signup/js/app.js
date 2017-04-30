@@ -5,6 +5,19 @@ var CERT_ENDPOINT = ',system/newCert';
 
 /* ---- DON'T EDIT BELOW ---- */
 var accURL = {};
+
+var storeVal = function(key,val) {
+    var store = new window.IdbKvStore('heka.house');
+    store.set(key,val, function (err) {if (err) throw err});    
+}
+
+var retrieveVal = function(key) {
+    var store = new window.IdbKvStore('heka.house');
+    store.get(key).then(value => {
+      return value;
+    });   
+}
+
 var queryVals = (function(a) {
     if (a == "") return {};
     var b = {};
@@ -21,6 +34,13 @@ var queryVals = (function(a) {
 
 var init = function() {
   // External source?
+
+  var home = retrieveVal('home');
+  
+  if (home) {
+    window.location.replace(home);    
+  }
+
   var _domain = queryVals['domain'];
   var _accEndpoint = queryVals['acc'];
   var _crtEndpoint = queryVals['crt'];
@@ -454,10 +474,7 @@ var createAccount = function() {
 
 // };
 
-var storeVal = function(key,val) {
-    var store = new window.IdbKvStore('heka.house');
-    store.set(key,val, function (err) {if (err) throw err});    
-}
+
 
 var certDone = function() {
   document.querySelector(".third").style.display = "none";
@@ -466,6 +483,8 @@ var certDone = function() {
   document.querySelector(".notifymessage").innerHTML += "(<a href=\"#\" onclick=\"createPKCS10()\">or click here if it hasn't</a>).";
   document.querySelector(".successbox").style.display = "";
   document.querySelector(".third-bullet").classList.add("completed");
+
+  storeVal('home',getAccount());
 
   // Prompt Firefox users to restart browser in order to use the client cert
   if (navigator.userAgent.indexOf('Firefox') >= 0) {
@@ -500,6 +519,11 @@ var returnToApp = function() {
 var showAccount = function() {
     var account = document.querySelector(".account").value;
     window.location.replace(makeURI(account));
+}
+
+var getAccount = function() {
+    var account = document.querySelector(".account").value;
+    return makeURI(account);
 }
 
 var setGravatar = function() {
