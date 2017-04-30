@@ -423,44 +423,42 @@ var createAccount = function() {
   }
 };
 
-var genCert = function() {
-  var account = document.querySelector(".account").value;
-  if (document.querySelector(".certname").value.length === 0) {
-    document.querySelector(".certname").value = "My "+account+" WebID account ";
-  }
+// var genCert = function() {
+//   var account = document.querySelector(".account").value;
+//   if (document.querySelector(".certname").value.length === 0) {
+//     document.querySelector(".certname").value = "My "+account+" WebID account ";
+//   }
 
-  window.crypto.subtle.generateKey(
-      {
-          name: "RSASSA-PKCS1-v1_5",
-          modulusLength: 2048, //can be 1024, 2048, or 4096
-          publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-          hash: {name: "SHA-256"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
-      },
-      false, //whether the key is extractable (i.e. can be used in exportKey)
-      ["sign", "verify"] //can be any combination of "sign" and "verify"
-  )
-  .then(function(key){
-      //returns a keypair object
-      console.log(key);
-      console.log(key.publicKey);
-      console.log(key.privateKey);
-      document.querySelector("#spkacWebID").value = key.publicKey;
-      document.querySelector(".spkacform").setAttribute("action", makeURI(account)+CERT_ENDPOINT);
-      document.querySelector(".spkacform").submit();
-      certDone();
-  })
-  .catch(function(err){
-      console.error(err);
-  });
+//   window.crypto.subtle.generateKey(
+//       {
+//           name: "RSASSA-PKCS1-v1_5",
+//           modulusLength: 2048, //can be 1024, 2048, or 4096
+//           publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+//           hash: {name: "SHA-256"}, //can be "SHA-1", "SHA-256", "SHA-384", or "SHA-512"
+//       },
+//       false, //whether the key is extractable (i.e. can be used in exportKey)
+//       ["sign", "verify"] //can be any combination of "sign" and "verify"
+//   )
+//   .then(function(key){
+//       //returns a keypair object
+//       console.log(key);
+//       console.log(key.publicKey);
+//       console.log(key.privateKey);
+//       document.querySelector("#spkacWebID").value = key.publicKey;
+
+//   })
+//   .catch(function(err){
+//       console.error(err);
+//   });
 
 
-};
+// };
 
 var certDone = function() {
   document.querySelector(".third").style.display = "none";
   document.querySelector(".issue").style.display = "none";
   document.querySelector(".notifymessage").innerHTML = "You're all set!<br>A certificate should have been installed in your browser ";
-  document.querySelector(".notifymessage").innerHTML += "(<a href=\"#\" onclick=\"genCert()\">or click here if it hasn't</a>).";
+  document.querySelector(".notifymessage").innerHTML += "(<a href=\"#\" onclick=\"create_PKCS10()\">or click here if it hasn't</a>).";
   document.querySelector(".successbox").style.display = "";
   document.querySelector(".third-bullet").classList.add("completed");
 

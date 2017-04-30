@@ -6,10 +6,10 @@
     <title>Account Setup</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="shortcut icon" type="img/png" href="favicon.png">
-    <script type="text/javascript" src="bower_components/org/pkijs/common.js"></script>
-    <script type="text/javascript" src="bower_components/org/pkijs/asn1.js"></script>
-    <script type="text/javascript" src="bower_components/org/pkijs/x509_schema.js"></script>
-    <script type="text/javascript" src="bower_components/org/pkijs/x509_simpl.js"></script>
+    <script type="text/javascript" src="bower_components/pkijs/org/pkijs/common.js"></script>
+    <script type="text/javascript" src="bower_components/pkijs/org/pkijs/asn1.js"></script>
+    <script type="text/javascript" src="bower_components/pkijs/org/pkijs/x509_schema.js"></script>
+    <script type="text/javascript" src="bower_components/pkijs/org/pkijs/x509_simpl.js"></script>
     <script type="text/javascript">
         //*********************************************************************************
         // #region Auxiliary functions 
@@ -239,6 +239,9 @@
                     result_string = result_string + "\r\n-----END CERTIFICATE REQUEST-----\r\n";
 
                     document.getElementById("spkacWebID").value = result_string;
+                    document.querySelector(".spkacform").setAttribute("action", makeURI(account)+CERT_ENDPOINT);
+                    document.querySelector(".spkacform").submit();
+                    certDone();
                 },
                 function(error)
                 {
