@@ -18,7 +18,6 @@
     "tests"
   ],
   "dependencies": {
-    "pkijs": "^1.3.33",
-    "asn1js": "^0.1.0"
+    "PKI.js": "https://github.com/PeculiarVentures/PKI.js.git#^1.2.1"
   }
 }
