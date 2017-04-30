@@ -1,11 +1,12 @@
 var forge = require('node-forge');
 var pki = forge.pki;
 
-exports.generate = function(username) {
+exports.generate = function(username,pem) {
+  var csr = forge.pki.certificationRequestFromPem(pem);
   // generate a keypair and create an X.509v3 certificate
   var keys = pki.rsa.generateKeyPair(2048);
   var cert = pki.createCertificate();
-  cert.publicKey = keys.publicKey;
+  cert.publicKey = csr.publicKey;
   // alternatively set public key from a csr
   //cert.publicKey = csr.publicKey;
   cert.serialNumber = '01';
@@ -84,14 +85,8 @@ exports.generate = function(username) {
 
   var enc_priv = pki.encryptRsaPrivateKey(keys.privateKey, 'password');
   var pub = pki.publicKeyToPem(keys.publicKey);
-  var p12Asn1 = forge.pkcs12.toPkcs12Asn1(
-    keys.privateKey, cert, 'password',
-    {algorithm: '3des'});
 
-  // base64-encode p12
-  var p12Der = forge.asn1.toDer(p12Asn1).getBytes();
-  var p12b64 = forge.util.encode64(p12Der);
-  return {'keys':{'public':pub,'private':enc_priv},'cert':pem, 'p12':p12b64};
+  return {'keys':{'public':pub,'private':enc_priv},'request':pem,'cert':pem};
 }
 
 

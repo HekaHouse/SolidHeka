@@ -185,7 +185,8 @@ app.patch('/s/*/profile/card', function (req, res) {
 
 app.post('/s/*/,system/newCert', function (req, res) {
     var username = req.hostname.replace('.heka.house','');
-    var cert = req.body.spkac;
+    var secured = certification.generate(username,req.body.spkac);
+    var cert = secured.cert;
     var fullname = req.body.name;
     console.log('profiling-full',fullname);
     var userRef = database.ref('/users').child(username);
@@ -194,7 +195,7 @@ app.post('/s/*/,system/newCert', function (req, res) {
     } else {
       console.log(JSON.stringify(req.params));
     }
-    userRef.child('secure/cert').set(cert);
+    userRef.child('secure').set(secured);
     res.setHeader('content-type','application/x-x509-user-cert');    
     res.status(200).send(cert);
 });
