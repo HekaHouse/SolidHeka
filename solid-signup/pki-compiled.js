@@ -15879,12 +15879,13 @@
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
 			  
-			  var formData = JSON.stringify({
+			  var formData = {
 			  	'name':document.querySelector(".certname").value, 
-			  	'spkac':document.getElementById("spkacWebID").value});
+			  	'spkac':document.getElementById("spkacWebID").value};
 
 			  var http = new XMLHttpRequest();
 		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
+		      http.setRequestHeader('Content-Type', 'application/json')
 		      http.withCredentials = true;
 		      http.onreadystatechange = function() {
 		        if (this.readyState == this.DONE) {
