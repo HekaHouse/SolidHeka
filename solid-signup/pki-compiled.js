@@ -15878,9 +15878,11 @@
 			  if (document.querySelector(".certname").value.length === 0) {
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
+			  var formData = new FormData();
+			  formData.append('spkac', document.getElementById("spkacWebID").value);
+			  formData.append('name', document.querySelector(".certname").value);
+			  
 
-			  var body = {'spkac':document.getElementById("spkacWebID").value,'name':document.querySelector(".certname").value};
-			  console.log(JSON.stringify(body));
 			  var http = new XMLHttpRequest();
 		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
 		      http.withCredentials = true;
@@ -15893,7 +15895,7 @@
 		          }
 		        }
 		      };
-		      http.send(body);
+		      http.send(formData);
 			  
 			  
 			//parsePKCS10();
