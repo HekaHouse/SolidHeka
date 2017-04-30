@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>Account Setup</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="shortcut icon" type="img/png" href="favicon.png">
+  </head>
+<body>
+	<div id="pickuser" class="account-setup">
+		<header>
+			<div class="solid center"><img src="images/solid-logo.png"></div>
+			<div class="status-progress">
+        <div class="progression float-left"></div>
+				<div class="clearfix">
+					<div class="float-left inline-block"><a class="first-bullet">1<span class="progress-info left">Create your account</span></a></div>
+					<div class="inline-block"><a class="second-bullet">2<span class="progress-info middle">Add more information</span></a></a></div>
+					<div class="float-right inline-block"><a class="third-bullet">3<span class="progress-info right">Generate keys</span></a></div>
+				</div>
+			</div> <!-- end status-progress -->
+		</header>
+
+    <article class="center">
+      <div class="notify successbox">
+        <h1>Success!</h1>
+        <div class="icon icon-success svg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="72px" height="72px">
+            <g fill="none" stroke="#43C47A" stroke-width="2">
+              <circle cx="36" cy="36" r="35" style="stroke-dasharray:240px, 240px; stroke-dashoffset: 480px;"></circle>
+              <path d="M17.417,37.778l9.93,9.909l25.444-25.393" style="stroke-dasharray:50px, 50px; stroke-dashoffset: 0px;"></path>
+            </g>
+          </svg>
+        </div>
+        <p class="notifymessage"></p>
+      </div>
+
+      <div class="first">
+        <form class="pure-form">
+          <h2>Welcome to <span class="welcome"></span>!</h2>
+          <p>Let's get you set up with an account.</p>
+          <a href="#chrome-instructions" id="toggle-chrome-instructions">Using Chrome? Click here</a>
+          <div id="chrome-instructions">
+            <p>
+              If you're using Chrome, you must first enable Key Generation for this page.
+            </p>
+            <ol>
+              <li>Click on the green padlock to the left of the left of the Address Bar.</li>
+              <li>Click on "Key Generation", and change the value from "Blocked by default" to "Always allow on this site".</li>
+              <li>You're all set!  Go ahead and sign up for Solid.</li>
+            </ol>
+          </div>
+          <input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
+          <div class="accountinfo">
+            <span class="schema"></span><strong><span class="username"></span></strong>.<span class="domain"></span>
+          </div>
+          <div class="illegal">
+            <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
+          </div>
+          <div class="status"></div>
+          <div class="email">
+            <input type="email" class="address" name="email" placeholder="Email (optional)">
+            <div class="">
+              <small>
+                Your email address will be used <u>only</u> for account recovery. Without it, you won't be able to recover your account .
+              </small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="second">
+        <form>
+          <h3>Username reserved...</h3>
+          <input type="file" id="inputFileToLoad" class="hidden" onchange="loadImageFileAsURL()">
+          <a href='#' onclick="clickFileInput()">
+            <div class="camera-wrap">
+              <span class='camera'></span>
+            </div>
+            <img class="profilepic hidden">
+          </a>
+          <a href="#" onclick="removePicture()">Remove picture</a>
+          <input type="text" class="fullname" name="name" value="" placeholder="Type your full name (optional)">
+        </form>
+      </div>
+
+      <div class="third">
+        <form class="spkacform" method="POST" target="spkacframe">
+          <input id="spkacWebID" name="spkac" class="hidden"></input>
+          <iframe class="hidden" name="spkacframe"></iframe>
+          <input type="text" class="webid hidden" name="webid">
+          <input type="text" class="certname hidden" name="name" value="" placeholder="Your name">
+          <h3>You're almost there!</h3>
+          <p class="justify">In this final step, strong cryptographic keys will be generated and installed in the browser. Using them avoids having to remember passwords, thus offerring increased security.</p>
+        </form>
+      </div>
+    </article>
+
+    <footer>
+      <div class="buttons center">
+        <a href="#" class="createacc button greenbg" onclick="createAccount()">Create account</a>
+        <a href="#" class="check button" onclick="checkExists()">Check availability</a>
+        <a href="#" class="update button" onclick="updateProfile()">Update profile (or skip)</a>
+        <a href="#" class="issue button" onclick="genCert()">Generate keys and finish</a>
+        <a href="#" class="return button" onclick="returnToApp()">Go back to the app</a>
+        <a href="#" class="done button" onclick="showAccount()">Take me to my account</a>
+      </div>
+    </footer>
+	</div> <!-- end account setup -->
+
+  <!-- Local Javascript -->
+  <script src="js/md5.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
