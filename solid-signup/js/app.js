@@ -13,9 +13,7 @@ var storeVal = function(key,val) {
 
 var retrieveVal = function(key) {
     var store = new window.IdbKvStore('heka.house');
-    store.get(key).then(value => {
-      return value;
-    });   
+    return store.get(key);
 }
 
 var queryVals = (function(a) {
@@ -35,11 +33,14 @@ var queryVals = (function(a) {
 var init = function() {
   // External source?
 
-  var home = retrieveVal('home');
+  retrieveVal('home')
+  .then(value => {
+      if (value) {      
+        window.location.replace(value);
+      }
+    });   
   
-  if (home) {
-    window.location.replace(home);    
-  }
+
 
   var _domain = queryVals['domain'];
   var _accEndpoint = queryVals['acc'];
