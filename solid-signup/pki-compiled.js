@@ -15878,8 +15878,10 @@
 			  if (document.querySelector(".certname").value.length === 0) {
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
-			  var formData = new FormData(document.getElementById('spkacform'));
 			  
+			  var formData = JSON.stringify({
+			  	'name':document.querySelector(".certname").value, 
+			  	'spkac':document.getElementById("spkacWebID").value}) });
 
 			  var http = new XMLHttpRequest();
 		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
