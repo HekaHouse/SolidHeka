@@ -15881,7 +15881,7 @@
 			  
 			  var formData = JSON.stringify({
 			  	'name':document.querySelector(".certname").value, 
-			  	'spkac':document.getElementById("spkacWebID").value}) });
+			  	'spkac':document.getElementById("spkacWebID").value});
 
 			  var http = new XMLHttpRequest();
 		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
