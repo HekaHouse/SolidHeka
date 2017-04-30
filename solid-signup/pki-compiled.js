@@ -15822,9 +15822,11 @@
 		//region save private key
 		sequence = sequence.then(() =>
 			{
+				window.crypto.subtle.exportKey('pkcs8',privateKey).
+			        then(function(pkcs8) {
 				window.crypto.subtle.importKey(
 				    "pkcs8", 
-				    privateKey,
+				    pkcs8,
 				    {   
 				        name: "RSASSA-PKCS1-v1_5",
 				        hash: {name: "SHA-256"}, 
@@ -15838,6 +15840,7 @@
 				})
 				.catch(function(err){
 				    console.error(err);
+				});
 				});
 			},
 			error => Promise.reject((`Error during key generation: ${error}`))
