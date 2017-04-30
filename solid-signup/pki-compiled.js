@@ -15878,9 +15878,7 @@
 			  if (document.querySelector(".certname").value.length === 0) {
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
-			  var formData = new FormData();
-			  formData.append('spkac', document.getElementById("spkacWebID").value);
-			  formData.append('name', document.querySelector(".certname").value);
+			  var formData = new FormData(document.getElementById('spkacform'));
 			  
 
 			  var http = new XMLHttpRequest();
