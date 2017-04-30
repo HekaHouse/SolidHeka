@@ -162,24 +162,26 @@
                 );
             // #endregion 
 
+            // #region Importing Private Key 
+            var keyoptions = {name: "RSASSA-PKCS1-v1_5",hash: {name: "SHA-256"}};
             sequence = sequence.then(
-                window.crypto.subtle.importKey(
-                    "pkcs8", 
-                    privateKey,
-                    {   
-                        name: "RSASSA-PKCS1-v1_5",
-                        hash: {name: "SHA-256"}, 
-                    },
-                    false, 
-                    ["sign"] 
-                )
-                .then(function(importedKey){
-                    privateKey = importedKey;
-                })
-                .catch(function(err){
-                    console.error(err);
-                });
-              );
+                function() {
+                    window.crypto.subtle.importKey("pkcs8", privateKey, keyoptions, false, ["sign"])
+                    .then(
+                        function(importedKey)
+                        {
+                            privateKey = importedKey;
+                        }
+                    )
+                    .catch(
+                        function(err)
+                        {
+                            console.error(err);
+                        }
+                    );
+                }                
+                );
+            // #endregion 
 
             // #region Exporting public key into "subjectPublicKeyInfo" value of PKCS#10 
             sequence = sequence.then(
