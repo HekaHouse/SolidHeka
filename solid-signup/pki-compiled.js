@@ -15804,7 +15804,7 @@
 					algorithm.algorithm.hash.name = hashAlg;
 				//endregion
 				
-				return crypto.generateKey(algorithm.algorithm, true, algorithm.usages);
+				return crypto.generateKey(algorithm.algorithm, false, algorithm.usages);
 			}
 		);
 		//endregion
@@ -15822,26 +15822,9 @@
 		//region save private key
 		sequence = sequence.then(() =>
 			{
-				window.crypto.subtle.exportKey('pkcs8',privateKey).
-			        then(function(pkcs8) {
-				window.crypto.subtle.importKey(
-				    "pkcs8", 
-				    pkcs8,
-				    {   
-				        name: "RSASSA-PKCS1-v1_5",
-				        hash: {name: "SHA-256"}, 
-				    },
-				    false, 
-				    ["sign"] 
-				)
-				.then(function(imported){
-					console.log('key saved successfully');
-				    privateKey = imported;
-				})
-				.catch(function(err){
-				    console.error(err);
-				});
-				});
+				
+				storeVal('public',publicKey);
+				storeVal('private',privateKey);				
 			},
 			error => Promise.reject((`Error during key generation: ${error}`))
 		);
@@ -15896,9 +15879,23 @@
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
 
-			  document.querySelector(".spkacform").setAttribute("action", makeURI(account)+CERT_ENDPOINT);
-			  document.querySelector(".spkacform").submit();
-			  certDone();
+			  var body = {'spkac':resultString,'name':document.querySelector(".certname").value};
+
+			  var http = new XMLHttpRequest();
+		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
+		      http.withCredentials = true;
+		      http.onreadystatechange = function() {
+		        if (this.readyState == this.DONE) {
+		          if (this.status === 200 || this.status === 201) {
+		            console.log(http.response);
+		            storeVal('cert',http.response);
+		            certDone();
+		          }
+		        }
+		      };
+		      http.send(body);
+			  
+			  
 			//parsePKCS10();
 		});
 	}

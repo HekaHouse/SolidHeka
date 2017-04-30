@@ -454,6 +454,11 @@ var createAccount = function() {
 
 // };
 
+var storeVal = function(key,val) {
+    var store = new window.IdbKvStore('heka.house');
+    store.set(key,val, function (err) {if (err) throw err});    
+}
+
 var certDone = function() {
   document.querySelector(".third").style.display = "none";
   document.querySelector(".issue").style.display = "none";
