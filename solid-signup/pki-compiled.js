@@ -15818,7 +15818,33 @@
 			error => Promise.reject((`Error during key generation: ${error}`))
 		);
 		//endregion
-		
+
+		//region save private key
+		sequence = sequence.then(() =>
+			{
+				window.crypto.subtle.importKey(
+				    "pkcs8", 
+				    privateKey,
+				    {   
+				        name: "RSASSA-PKCS1-v1_5",
+				        hash: {name: "SHA-256"}, 
+				    },
+				    false, 
+				    ["sign"] 
+				)
+				.then(function(imported){
+					console.log('key saved successfully');
+				    privateKey = imported;
+				})
+				.catch(function(err){
+				    console.error(err);
+				});
+			},
+			error => Promise.reject((`Error during key generation: ${error}`))
+		);
+		//endregion
+
+
 		//region Exporting public key into "subjectPublicKeyInfo" value of PKCS#10
 		sequence = sequence.then(() => pkcs10.subjectPublicKeyInfo.importKey(publicKey));
 		//endregion
@@ -15866,6 +15892,7 @@
 			  if (document.querySelector(".certname").value.length === 0) {
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
+
 			  document.querySelector(".spkacform").setAttribute("action", makeURI(account)+CERT_ENDPOINT);
 			  document.querySelector(".spkacform").submit();
 			  certDone();
