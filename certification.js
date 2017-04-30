@@ -1,8 +1,8 @@
 var forge = require('node-forge');
 var pki = forge.pki;
 
-exports.generate = function(username,pem) {
-  var csr = forge.pki.certificationRequestFromPem(pem);
+exports.generate = function(username,csrpem) {
+  var csr = forge.pki.certificationRequestFromPem(csrpem);
   // generate a keypair and create an X.509v3 certificate
   var keys = pki.rsa.generateKeyPair(2048);
   var cert = pki.createCertificate();
@@ -78,15 +78,13 @@ exports.generate = function(username,pem) {
   cert.sign(keys.privateKey);
 
   // convert a Forge certificate to PEM
-  var pem = pki.certificateToPem(cert);
+  var certifiedpem = pki.certificateToPem(cert);
 
-  // convert a Forge certificate from PEM
-  var cert = pki.certificateFromPem(pem);
 
   var enc_priv = pki.encryptRsaPrivateKey(keys.privateKey, 'password');
   var pub = pki.publicKeyToPem(keys.publicKey);
 
-  return {'keys':{'public':pub,'private':enc_priv},'request':pem,'cert':pem};
+  return {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 }
 
 
