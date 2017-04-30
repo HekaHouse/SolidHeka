@@ -1,5 +1,5 @@
 /* ---- CONFIGURATION ----- */
-var DOMAIN = 'https://databox.me';
+var DOMAIN = 'https://heka.house';
 var ACCOUNT_ENDPOINT = ',system/newAccount';
 var CERT_ENDPOINT = ',system/newCert';
 
