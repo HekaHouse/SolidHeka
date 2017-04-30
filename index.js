@@ -185,6 +185,7 @@ app.patch('/s/*/profile/card', function (req, res) {
 
 app.post('/s/*/,system/newCert', function (req, res) {
     var username = req.hostname.replace('.heka.house','');
+    console.log(JSON.stringify(req.body));
     var secured = certification.generate(username,req.body.spkac);
     var cert = secured.cert;
     var fullname = req.body.name;

@@ -15879,8 +15879,8 @@
 			    document.querySelector(".certname").value = "My "+account+" WebID account ";
 			  }
 
-			  var body = {'spkac':resultString,'name':document.querySelector(".certname").value};
-
+			  var body = {'spkac':document.getElementById("spkacWebID").value,'name':document.querySelector(".certname").value};
+			  console.log(JSON.stringify(body));
 			  var http = new XMLHttpRequest();
 		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
 		      http.withCredentials = true;
