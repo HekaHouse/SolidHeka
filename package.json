@@ -26,5 +26,8 @@
     "solid-client": "^0.24.0",
     "solid-server": "^3.5.0",
     "wildcard-subdomains": "^1.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1"
   }
 }
