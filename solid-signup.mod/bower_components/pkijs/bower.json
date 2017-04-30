@@ -1,0 +1,32 @@
+{
+  "name": "pkijs",
+  "description": "Public Key Infrastructure (PKI) is the basis of how identity and key management is performed on the web today. PKIjs is a pure JavaScript library implementing the formats that are used in PKI applications. It is built on WebCrypto and aspires to make it possible to build native web applications that utilize X.509 and the related formats on the web without plug-ins",
+  "main": "org/pkijs/x509_simpl.js",
+  "authors": [
+    "Ryan Hurst <rmh@unmitigatedrisk.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "WebCrypto",
+    "Web",
+    "Cryptography",
+    "API",
+    "X.509",
+    "certificate",
+    "crl",
+    "cms",
+    "encrypted",
+    "enveloped",
+    "OCSP",
+    "timestamp",
+    "PKCS"
+  ],
+  "homepage": "https://github.com/lbthomsen/PKI.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
