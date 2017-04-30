@@ -196,7 +196,7 @@ app.post('/s/*/,system/newCert', function (req, res) {
     }
     userRef.child('secure/cert').set(cert);
     res.setHeader('content-type','application/x-x509-user-cert');    
-    res.status(200).send(secured.cert);
+    res.status(200).send(cert);
 });
 
 
