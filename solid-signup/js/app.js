@@ -458,7 +458,7 @@ var certDone = function() {
   document.querySelector(".third").style.display = "none";
   document.querySelector(".issue").style.display = "none";
   document.querySelector(".notifymessage").innerHTML = "You're all set!<br>A certificate should have been installed in your browser ";
-  document.querySelector(".notifymessage").innerHTML += "(<a href=\"#\" onclick=\"create_PKCS10()\">or click here if it hasn't</a>).";
+  document.querySelector(".notifymessage").innerHTML += "(<a href=\"#\" onclick=\"createPKCS10()\">or click here if it hasn't</a>).";
   document.querySelector(".successbox").style.display = "";
   document.querySelector(".third-bullet").classList.add("completed");
 

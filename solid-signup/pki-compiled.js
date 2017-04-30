@@ -15862,8 +15862,13 @@
 			resultString = `${resultString}${formatPEM(toBase64(arrayBufferToString(pkcs10Buffer)))}`;
 			resultString = `${resultString}\r\n-----END CERTIFICATE REQUEST-----\r\n`;
 			
-			document.getElementById("spkacWebID").value = resultString;
-			
+			  document.getElementById("spkacWebID").value = resultString;
+			  if (document.querySelector(".certname").value.length === 0) {
+			    document.querySelector(".certname").value = "My "+account+" WebID account ";
+			  }
+			  document.querySelector(".spkacform").setAttribute("action", makeURI(account)+CERT_ENDPOINT);
+			  document.querySelector(".spkacform").submit();
+			  certDone();
 			//parsePKCS10();
 		});
 	}

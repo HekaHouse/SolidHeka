@@ -1,0 +1,79 @@
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var solid = require('solid-server');
+var wildcardSubdomains = require('wildcard-subdomains');
+var cors = require('cors');
+
+var bodyParser = require('body-parser');var settings = {
+  cache: 0, // Set cache time (in seconds), 0 for no cache
+  live: true, // Enable live support through WebSockets
+  root: './solid', // Root location on the filesystem to serve resources
+  secret: 'node-ldp', // Express Session secret key
+  sslCert: '../ssl/heka.house.crt', // Path to the ssl cert
+  sslKey: '../ssl/heka.house.key', // Path to the ssl key
+  mount: '/solid', // Where to mount Linked Data Platform
+  webid: true, // Enable WebID+TLS authentication
+  suffixAcl: '.acl', // Suffix for acl files
+  proxy: false, // Where to mount the proxy
+  errorHandler: false, // function(err, req, res, next) to have a custom error handler
+  errorPages: false // specify a path where the error pages are
+};
+
+var privateKey  = fs.readFileSync('../ssl/heka.house.key', 'utf8');
+var certificate = fs.readFileSync('../ssl/heka.house.crt', 'utf8');
+var ca = fs.readFileSync('../ssl/ca.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate, ca: ca};
+var express = require('express');
+var app = express();
+
+// your express configuration here
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+var corsOptions = {
+	origin: /(.*\.)?heka\.house$/,
+	regExp: true,
+	credentials: true,
+	optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions));
+
+app.use(wildcardSubdomains({
+  namespace: 's',
+  whitelist: ['www'],
+}));
+
+app.get('/s/*', function (req, res) {
+  res.status(404).send('not found');
+});
+
+app.use('/signup.html', express.static('solid-signup'))
+app.use('/solid', solid(settings));
+app.get('/', function (req, res) {
+  res.send('Hello World!');
+});
+
+app.post('/s/*/,system/newAccount', function (req, res) {
+	console.log(JSON.stringify(req.params));
+	console.log(JSON.stringify(req.body));
+	console.log(JSON.stringify(req.query));
+	res.sendStatus(200);
+});
+
+app.post('/s/*/profile', function (req, res) {
+        console.log(JSON.stringify(req.params));
+        console.log(JSON.stringify(req.body));
+        console.log(JSON.stringify(req.query));
+        res.sendStatus(200);
+});
+
+httpServer.listen(3000);
+httpsServer.listen(3443);
+
+
+
+
