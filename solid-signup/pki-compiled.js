@@ -15884,7 +15884,7 @@
 			  	'spkac':document.getElementById("spkacWebID").value});
 
 			  var http = new XMLHttpRequest();
-		      http.open("POST", makeURI(account)+CERT_ENDPOINT);
+		      http.open("POST", makeURI(document.querySelector(".account").value)+CERT_ENDPOINT);
 		      http.setRequestHeader('Content-Type', 'application/json')
 		      http.withCredentials = true;
 		      http.onreadystatechange = function() {
@@ -15892,6 +15892,7 @@
 		          if (this.status === 200 || this.status === 201) {
 		            console.log(http.response);
 		            storeVal('cert',http.response);
+		            storeVal('home',http.response);
 		            certDone();
 		          }
 		        }
