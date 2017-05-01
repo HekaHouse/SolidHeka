@@ -33,6 +33,25 @@ var makeHost = function(username) {
   return null;
 }
 
+function validateAccount() {
+  //resetAvailability();
+  var account = document.querySelector(".account").value;
+  // cleaup
+  account = account.toLowerCase().replace(/\s+/g, '-');
+  if (account.indexOf('-') === 0) {
+    account = account.slice(1);
+  }
+  var re = /^[a-zA-Z0-9-_]*$/;
+  if (account.length === 0) {
+    //resetAvailability();
+  } else if (re.test(account)) {
+    document.querySelector(".account").value = account;
+  } else {  	
+    //resetAvailability();
+    //document.querySelector(".illegal").style.display = "";
+  }
+}
+
 exports.requestPersona = function(persona,cb) {
 	
 	
