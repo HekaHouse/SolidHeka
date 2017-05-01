@@ -162,9 +162,9 @@
 		};
 		var isAvailable = function(url) {
 		  document.querySelector(".status").innerHTML = "is available";
-		  document.querySelector(".createacc").style.display = "";
-		  document.querySelector(".check").style.display = "none";
-		  document.querySelector(".email").style.display = "";
+		  document.querySelector(".createacc").style.visibility = "visible";
+		  document.querySelector(".check").style.visibility = "collapsed";
+		  document.querySelector(".email").style.visibility = "visible";
 		  document.querySelector(".accountinfo").classList.add('green');
 		  document.querySelector(".accountinfo").classList.remove('red');
 		  window.setTimeout(function () {
@@ -191,7 +191,7 @@
     	<div class="illegal center">
 		    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
 	    </div>
-	      <div class="status"></div>
+	      <div class="status center"></div>
 	      <div class="email">
 	        <input type="email" class="address" name="email" placeholder="Email (optional)">
 	        <div class="">
