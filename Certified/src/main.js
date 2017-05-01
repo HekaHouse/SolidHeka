@@ -35,31 +35,5 @@ function definePersonaCSR(
 	};
 }
 
-certified
-.generateRSAKeyPair()
-.then(function(keyPair){			
-	storeKeys(keyPair);		
-	return certified.generateCSR(keyPair,db,definePersonaCSR());
-})
-.then(function(csr){			
-	certified.storeKeyValue(db,'csr',csr);				
-	certified.verifyCSR(csr)
-	.then(function(verified){
-		console.log(verified);
-		if (verified) {
-			certified.parseCSR(csr)
-			.then(function(csrStruct){
-				return JSON.stringify(csrStruct);
-			})
-			.then(showResult);
-		}
-	});			
-});
+
 		 
-api.requestPersona('liberus', function(available){
-	if (available === '404') {
-		console.log('it worked!');
-	} else {
-		console.log('unavailable',available);
-	}
-});
