@@ -90,7 +90,7 @@ var requestPersona = function(persona,cb) {
 };
 
 
-exports.createAccount = function(account,email) {
+var createAccount = function(account,email) {
 	if (account.length > 0) {
 		var url = makeURI(account) + ACCOUNT_ENDPOINT;
 		var data = "username="+account+"&email="+email;
@@ -112,3 +112,5 @@ exports.createAccount = function(account,email) {
 };
 
 window.requestPersona = requestPersona;
+
+window.createAccount = createAccount;
