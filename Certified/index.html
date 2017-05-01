@@ -149,7 +149,7 @@
 		};		
 		var checkExists = function() {
 			if (document.querySelector(".account").value.length >= 1) {
-				api.requestPersona(document.querySelector(".account").value, function(available){
+				requestPersona(document.querySelector(".account").value, function(available){
 					if (available === '404') {
 						isAvailable(document.querySelector(".account").value);
 					} else {

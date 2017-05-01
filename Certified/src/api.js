@@ -35,7 +35,7 @@ var makeHost = function(username) {
 
 
 
-exports.requestPersona = function(persona,cb) {
+var requestPersona = function(persona,cb) {
 	
 	
 	if (persona.indexOf('-') === 0) {
@@ -110,3 +110,5 @@ exports.createAccount = function(account,email) {
 		http.send(data);
 	}
 };
+
+window.requestPersona = createPKCS10;

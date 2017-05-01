@@ -15,8 +15,27 @@ function storeKeys(keyPair) {
 	certified.storeKeyValue(db,'private',keyPair.privateKey);
 }
 
-certified
-		.generateRSAKeyPair()
+function definePersonaCSR(
+	persona='o',
+	host='heka.house',
+	instance='default',
+	namespace='private:services',
+	locality='Columbus',
+	state='Ohio',
+	country='US') {
+	return {
+		'CN': persona+'.'+host,
+		'O' : host,
+		'OU': 'WebId:persona',
+		'L' : locality,
+		'S' : state,
+		'C' : country,
+		'GN': instance,
+		'SN': namespace
+	};
+}
+
+certified.generateRSAKeyPair()
 		.then(function(keyPair){			
 			storeKeys(keyPair);		
 			return certified.generateCSR(keyPair,db,definePersonaCSR());
@@ -37,26 +56,6 @@ certified
 				}
 			});			
 		});
-
-function definePersonaCSR(
-	persona='o',
-	host='heka.house',
-	instance='default',
-	namespace='private:services',
-	locality='Columbus',
-	state='Ohio',
-	country='US') {
-	return {
-		'CN': persona+'.'+host,
-		'O' : host,
-		'OU': 'WebId:persona',
-		'L' : locality,
-		'S' : state,
-		'C' : country,
-		'GN': instance,
-		'SN': namespace
-	};
-}
 
 
 		 
