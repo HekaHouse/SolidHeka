@@ -26,8 +26,22 @@
 		}
    	</style>
    	<script>
-   		function validateAccount() {
-		  //resetAvailability();
+   		var resetAvailability = function() {
+		  // document.querySelector(".email").style.display = "none";
+		  // document.querySelector(".status").innerHTML = '';
+		  document.querySelector(".illegal").style.display = "none";
+		  // document.querySelector(".createacc").style.display = "none";
+		  // document.querySelector(".check").style.display = "";
+		  // document.querySelector(".accountinfo").classList.remove('green');
+		  // document.querySelector(".accountinfo").style.display = "none";
+		  // document.querySelector(".check").classList.add("disabled");
+		  // document.querySelector(".createacc").classList.remove("greenbg");
+		  // document.querySelector(".createacc").classList.add("disabled");
+		  // document.querySelector(".return").style.display = "none";
+		  // document.querySelector(".done").style.display = "none";
+		}
+   		var validateAccount = function() {
+		  resetAvailability();
 		  var account = document.querySelector(".account").value;
 		  // cleaup
 		  account = account.toLowerCase().replace(/\s+/g, '-');
@@ -36,18 +50,21 @@
 		  }
 		  var re = /^[a-zA-Z0-9-_]*$/;
 		  if (account.length === 0) {
-		    //resetAvailability();
+		    resetAvailability();
 		  } else if (re.test(account)) {
 		    document.querySelector(".account").value = account;
 		  } else {  	
-		    //resetAvailability();
-		    //document.querySelector(".illegal").style.display = "";
+		    resetAvailability();
+		    document.querySelector(".illegal").style.display = "";
 		  }
-		}
+		};		
    	</script>
   </head>
   <body>
-    <script src="dist/bundle.js"></script>
-    <input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
+	<script src="dist/bundle.js"></script>
+	<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
+    <div class="illegal">
+	    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
+    </div>
   </body>
 </html>

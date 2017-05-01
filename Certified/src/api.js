@@ -13,6 +13,7 @@ function init() {
 	accURL.host = parser.host + '/'; // => "example.com"
 	accURL.path = parser.pathname; // => "/pathname/"
 	accURL.schema = parser.protocol + '//';
+	document.querySelector(".illegal").style.display = "";
 }
 
 init();
