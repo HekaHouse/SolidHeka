@@ -163,7 +163,8 @@
 		var isAvailable = function(url) {
 		  document.querySelector(".status").innerHTML = "is available";
 		  document.querySelector(".createacc").style.visibility = "visible";
-		  document.querySelector(".check").style.visibility = "collapse";
+		  document.querySelector(".createacc").classList.remove("disabled");
+		  document.querySelector(".check").style.visibility = "collapse";		  
 		  document.querySelector(".email").style.visibility = "visible";
 		  document.querySelector(".accountinfo").classList.add('green');
 		  document.querySelector(".accountinfo").classList.remove('red');
