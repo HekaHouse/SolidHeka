@@ -79,7 +79,7 @@
 		    line-height: 1px;
 		    text-transform: uppercase;
 		    border: 0;
-		    visibility: hidden;
+		    visibility: collapse;
 		}
 
 		.button:hover { background: #5a83dd; }	
@@ -88,7 +88,7 @@
 			pointer-events: none;
 		}
 		.hidden {
-			visibility: collapsed!important;
+			visibility: collapse!important;
 		}
 		.green {
 			color: #43C47A;
@@ -112,17 +112,17 @@
    	</style>
    	<script>
    		var resetAvailability = function() {
-		  document.querySelector(".email").style.visibility = "collapsed";
+		  document.querySelector(".email").style.visibility = "collapse";
 		  document.querySelector(".status").innerHTML = '';
 		  document.querySelector(".check").style.visibility = "visible";
-		  document.querySelector(".illegal").style.visibility = "collapsed";
-		  document.querySelector(".createacc").style.visibility = "collapsed";
-		  document.querySelector(".update").style.visibility = "collapsed";
-		  document.querySelector(".issue").style.visibility = "collapsed";		 
-		  document.querySelector(".return").style.visibility = "collapsed";
-		  document.querySelector(".done").style.visibility = "collapsed";
+		  document.querySelector(".illegal").style.visibility = "collapse";
+		  document.querySelector(".createacc").style.visibility = "collapse";
+		  document.querySelector(".update").style.visibility = "collapse";
+		  document.querySelector(".issue").style.visibility = "collapse";		 
+		  document.querySelector(".return").style.visibility = "collapse";
+		  document.querySelector(".done").style.visibility = "collapse";
 		  document.querySelector(".accountinfo").classList.remove('green');
-		  document.querySelector(".accountinfo").style.visibility = "collapsed";
+		  document.querySelector(".accountinfo").style.visibility = "collapse";
 		  document.querySelector(".check").classList.add("disabled");		  
 		  document.querySelector(".createacc").classList.remove("greenbg");
 		  document.querySelector(".createacc").classList.add("disabled");
@@ -163,7 +163,7 @@
 		var isAvailable = function(url) {
 		  document.querySelector(".status").innerHTML = "is available";
 		  document.querySelector(".createacc").style.visibility = "visible";
-		  document.querySelector(".check").style.visibility = "collapsed";
+		  document.querySelector(".check").style.visibility = "collapse";
 		  document.querySelector(".email").style.visibility = "visible";
 		  document.querySelector(".accountinfo").classList.add('green');
 		  document.querySelector(".accountinfo").classList.remove('red');
