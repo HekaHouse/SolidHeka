@@ -79,7 +79,7 @@ app.use(wildcardSubdomains({
 }));
 
 
-app.use('/signup.html', express.static('solid-signup'))
+app.use('/signup.html', express.static('Certification'))
 
 app.use('/solid', solid(settings));
 
