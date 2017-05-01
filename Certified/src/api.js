@@ -12,8 +12,7 @@ function init() {
 	parser.href = DOMAIN;
 	accURL.host = parser.host + '/'; // => "example.com"
 	accURL.path = parser.pathname; // => "/pathname/"
-	accURL.schema = parser.protocol + '//';
-	document.querySelector(".illegal").style.display = "";
+	accURL.schema = parser.protocol + '//';	
 }
 
 init();
