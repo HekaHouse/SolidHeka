@@ -95,6 +95,7 @@ app.get('/', function (req, res) {
 //{"webid":"","name":"Aron Price"}
 
 app.get('/s/*', function (req, res) {
+
   console.log('checking',req.hostname.replace('.heka.house',''));
   database.ref('/users/'+req.hostname.replace('.heka.house','')).once('value').then(function(snapshot) {
     if (snapshot.val()) {

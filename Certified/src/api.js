@@ -26,6 +26,13 @@ var makeURI = function(username) {
   return null;
 }
 
+var makeHost = function(username) {
+  if (username.length > 0) {
+    return username + '.' + accURL.host;
+  }
+  return null;
+}
+
 exports.requestPersona = function(persona) {
 	
 	
