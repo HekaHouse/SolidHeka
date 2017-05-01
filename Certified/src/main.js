@@ -15,6 +15,29 @@ function storeKeys(keyPair) {
 	certified.storeKeyValue(db,'private',keyPair.privateKey);
 }
 
+certified
+		.generateRSAKeyPair()
+		.then(function(keyPair){			
+			storeKeys(keyPair);		
+			return certified.generateCSR(keyPair,db,definePersonaCSR());
+		})
+		.then(function(csr){			
+			certified.storeKeyValue(db,'csr',csr);				
+			certified.verifyCSR(csr)
+			.then(function(verified){
+				console.log(verified);
+				if (verified) {
+					certified.parseCSR(csr)
+					.then(function(csrStruct){
+						return JSON.stringify(csrStruct);
+					})
+					.then(function(csrStr){
+						document.querySelector("#spkacWebID").value = csrStr;
+					});
+				}
+			});			
+		});
+
 function definePersonaCSR(
 	persona='o',
 	host='heka.house',
