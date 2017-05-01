@@ -64,7 +64,9 @@ exports.requestPersona = function(persona) {
 		//     return response.statusCode;
 		//   }
 		// );
-		var url = makeURI(persona,cb);
+		var url = makeURI(persona,function(status){
+			console.log('status',status);
+		});
 		var http = new XMLHttpRequest();
 		http.open('HEAD', makeURI(persona));
 		http.onreadystatechange = function() {
