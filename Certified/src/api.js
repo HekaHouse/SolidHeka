@@ -42,7 +42,7 @@ exports.requestPersona = function(persona) {
 		    method: 'HEAD',				    
 		    hostname: makeURI(persona),
 		    path: '/',
-		    port: 80,
+		    port: 443,
 		    headers: {},
 		    body: ''
 		};
