@@ -29,6 +29,35 @@
 			color: red;
 			visibility: hidden;
 		}
+		.buttons {
+			padding: 14px 0 14px 0;
+		}
+
+		.button {
+			display: inline-block;
+			width: 100%;
+		    padding: 25px 0 25px 0;
+		    background: #69f;
+		    border-radius: 4px;
+		    font-weight: normal;
+		    font-size: 14px;
+		    color: #fff;
+		    letter-spacing: 1px;
+		    line-height: 1px;
+		    text-transform: uppercase;
+		    border: 0;
+		}
+
+		.button:hover { background: #5a83dd; }	
+		.center {
+			text-align: center;
+		}	
+		.greenbg {
+			background-color: #43C47A;
+		}
+		.greenbg:hover {
+			background-color: #43C44D;
+		}		
    	</style>
    	<script>
    		var resetAvailability = function() {
@@ -68,8 +97,18 @@
   <body>
 	<script src="dist/bundle.js"></script>
 	<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
-    <div class="illegal">
+    <div class="illegal center">
 	    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
     </div>
+    <footer>
+		<div class="buttons center">
+			<a href="#" class="createacc button greenbg" onclick="createAccount()">Create account</a>
+			<a href="#" class="check button" onclick="checkExists()">Check availability</a>
+			<a href="#" class="update button" onclick="updateProfile()">Update profile (or skip)</a>
+			<a href="#" class="issue button" onclick="createPKCS10()">Generate keys and finish</a>
+			<a href="#" class="return button" onclick="returnToApp()">Go back to the app</a>
+			<a href="#" class="done button" onclick="showAccount()">Take me to my account</a>
+		</div>
+    </footer>
   </body>
 </html>
