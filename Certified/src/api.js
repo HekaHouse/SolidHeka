@@ -111,4 +111,4 @@ exports.createAccount = function(account,email) {
 	}
 };
 
-window.requestPersona = createPKCS10;
+window.requestPersona = requestPersona;
