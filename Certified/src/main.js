@@ -56,10 +56,10 @@ certified
 	});			
 });
 		 
-api.requestPersona('aron').then(function(available){
+api.requestPersona('liberus', function(available){
 	if (available === '404') {
 		console.log('it worked!');
 	} else {
 		console.log('unavailable',available);
 	}
-})
+});

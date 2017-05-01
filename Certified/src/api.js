@@ -44,43 +44,43 @@ exports.requestPersona = function(persona) {
 	}
 
 	if (persona.length > 0) {
-		var mrp = require('minimal-request-promise');
-		options = {
-		    method: 'HEAD',				    
-		    hostname: makeURI(persona),
-		    path: '/',
-		    port: 443,
-		    headers: {},
-		    body: ''
-		};
-		return mrp(options).then(
-		  function (response) {
-		    return response.statusCode;
-		  },
-		  function (response) {
-		  	if (response.statusCode === undefined) {
-		  		return '999';
-		  	}
-		    return response.statusCode;
-		  }
-		);
-		// var url = makeURI(persona);
-		// var http = new XMLHttpRequest();
-		// http.open('HEAD', 'file:///C:/Users/aron2/Documents/GitHub/Certified/balogna.html');
-		// http.onreadystatechange = function() {
-		//   console.log(this.status)
-		//     if (this.readyState == this.DONE) {
-		//       if (this.status === 0) {
-		//       	console.log('not connected');
-		//         return '999';		        
-		//       } else if (this.status === 404) {
-		//         return '404';
-		//       } else {
-		//         return this.status;
-		//       }
-		//     }
+		// var mrp = require('minimal-request-promise');
+		// options = {
+		//     method: 'HEAD',				    
+		//     hostname: makeURI(persona),
+		//     path: '/',
+		//     port: 443,
+		//     headers: {},
+		//     body: ''
 		// };
-		// http.send();
+		// return mrp(options).then(
+		//   function (response) {
+		//     return response.statusCode;
+		//   },
+		//   function (response) {
+		//   	if (response.statusCode === undefined) {
+		//   		return '999';
+		//   	}
+		//     return response.statusCode;
+		//   }
+		// );
+		var url = makeURI(persona,cb);
+		var http = new XMLHttpRequest();
+		http.open('HEAD', makeURI(persona));
+		http.onreadystatechange = function() {
+		  console.log(this.status)
+		    if (this.readyState == this.DONE) {
+		      if (this.status === 0) {
+		      	console.log('not connected');
+		        cb('999');		        
+		      } else if (this.status === 404) {
+		        cb('404');
+		      } else {
+		        cb(this.status);
+		      }
+		    }
+		};
+		http.send();
 	}
 	
 };
