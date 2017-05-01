@@ -82,6 +82,19 @@
 		}
 
 		.button:hover { background: #5a83dd; }	
+		.disabled {
+			background-color: #ccc;
+			pointer-events: none;
+		}
+
+		.green {
+			color: #43C47A;
+		}
+
+		.red {
+		  color: red;
+		}
+
 		.center {
 			text-align: center;
 		}	
@@ -103,11 +116,11 @@
 		  document.querySelector(".issue").style.visibility = "collapsed";		 
 		  document.querySelector(".return").style.visibility = "collapsed";
 		  document.querySelector(".done").style.visibility = "collapsed";
-		  // document.querySelector(".accountinfo").classList.remove('green');
-		  // document.querySelector(".accountinfo").style.display = "none";
-		  // document.querySelector(".check").classList.add("disabled");
-		  // document.querySelector(".createacc").classList.remove("greenbg");
-		  // document.querySelector(".createacc").classList.add("disabled");
+		  document.querySelector(".accountinfo").classList.remove('green');
+		  document.querySelector(".accountinfo").style.visibility = "collapsed";
+		  document.querySelector(".check").classList.add("disabled");
+		  document.querySelector(".createacc").classList.remove("greenbg");
+		  document.querySelector(".createacc").classList.add("disabled");
 		}
    		var validateAccount = function() {
 		  resetAvailability();
@@ -122,18 +135,52 @@
 		    resetAvailability();
 		  } else if (re.test(account)) {
 		    document.querySelector(".account").value = account;
+		    document.querySelector(".check").classList.add("enabled");
 		  } else {  	
 		    resetAvailability();
 		    document.querySelector(".illegal").style.visibility = "visible";
 		  }
 		};		
+		var checkExists = function() {
+			if (document.querySelector(".account").value.length >= 1) {
+				api.requestPersona(document.querySelector(".account").value, function(available){
+					if (available === '404') {
+						isAvailable(document.querySelector(".account").value);
+					} else {
+						isTaken(document.querySelector(".account").value);
+						console.log('unavailable',available);
+					}
+				});	
+			} 
+			
+		};
+		var isAvailable = function(url) {
+		  document.querySelector(".status").innerHTML = "is available";
+		  document.querySelector(".createacc").style.display = "";
+		  document.querySelector(".check").style.display = "none";
+		  document.querySelector(".email").style.display = "";
+		  document.querySelector(".accountinfo").classList.add('green');
+		  document.querySelector(".accountinfo").classList.remove('red');
+		  window.setTimeout(function () {
+		    document.querySelector(".account").focus();
+		  }, 0);
+		};
+
+		var isTaken = function(url) {
+		  document.querySelector(".status").innerHTML = "is taken";
+		  document.querySelector(".accountinfo").classList.remove('green');
+		  document.querySelector(".accountinfo").classList.add('red');
+		}		
    	</script>
   </head>
   <body>
 	<script src="dist/bundle.js"></script>
 	<article>
-		<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
-	    <div class="illegal center">
+		<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>	    
+    	<div class="accountinfo">
+        	<span class="schema"></span><strong><span class="username"></span></strong>.<span class="domain"></span>
+    	</div>
+    	<div class="illegal center">
 		    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
 	    </div>
 	      <div class="status"></div>
