@@ -94,18 +94,20 @@
    	</style>
    	<script>
    		var resetAvailability = function() {
-		  // document.querySelector(".email").style.display = "none";
-		  // document.querySelector(".status").innerHTML = '';
+		  document.querySelector(".email").style.visibility = "hidden";
+		  document.querySelector(".status").innerHTML = '';
+		  document.querySelector(".check").style.visibility = "visible";
 		  document.querySelector(".illegal").style.visibility = "hidden";
-		  // document.querySelector(".createacc").style.display = "none";
-		  // document.querySelector(".check").style.display = "";
+		  document.querySelector(".createacc").style.visibility = "hidden";
+		  document.querySelector(".update").style.visibility = "hidden";
+		  document.querySelector(".issue").style.visibility = "hidden";		 
+		  document.querySelector(".return").style.visibility = "hidden";
+		  document.querySelector(".done").style.visibility = "hidden";
 		  // document.querySelector(".accountinfo").classList.remove('green');
 		  // document.querySelector(".accountinfo").style.display = "none";
 		  // document.querySelector(".check").classList.add("disabled");
 		  // document.querySelector(".createacc").classList.remove("greenbg");
 		  // document.querySelector(".createacc").classList.add("disabled");
-		  // document.querySelector(".return").style.display = "none";
-		  // document.querySelector(".done").style.display = "none";
 		}
    		var validateAccount = function() {
 		  resetAvailability();
@@ -129,10 +131,21 @@
   </head>
   <body>
 	<script src="dist/bundle.js"></script>
-	<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
-    <div class="illegal center">
-	    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
-    </div>
+	<article>
+		<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>
+	    <div class="illegal center">
+		    <small>Only letters, numbers, hyphens (-) and underscores (_) are accepted.</small>
+	    </div>
+	      <div class="status"></div>
+	      <div class="email">
+	        <input type="email" class="address" name="email" placeholder="Email (optional)">
+	        <div class="">
+	          <small>
+	            Your email address will be used <u>only</u> for account recovery. Without it, you won't be able to recover your account .
+	          </small>
+	        </div>
+	      </div> 
+      </article>   
     <footer>
 		<div class="buttons center">
 			<a href="#" class="createacc button greenbg" onclick="createAccount()">Create account</a>
