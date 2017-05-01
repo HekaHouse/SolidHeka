@@ -33,7 +33,7 @@ var makeHost = function(username) {
   return null;
 }
 
-exports.requestPersona = function(persona) {
+exports.requestPersona = function(persona,cb) {
 	
 	
 	if (persona.indexOf('-') === 0) {
