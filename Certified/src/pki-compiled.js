@@ -15917,14 +15917,35 @@
 	//*********************************************************************************
 	//region Verify Certificate
 	//*********************************************************************************
+
+	function toBin(str){
+	 var st,i,j,d;
+	 var arr = [];
+	 var len = str.length;
+	 for (i = 1; i<=len; i++){
+	                //reverse so its like a stack
+	  d = str.charCodeAt(len-i);
+	  for (j = 0; j < 8; j++) {
+	   arr.push(d%2);
+	   d = Math.floor(d/2);
+	  }
+	 }
+	        //reverse all bits again.
+	 return arr.reverse().join("");
+	}
 	function verifyCertificate(secure)
 	{
 		
 		var signature = secure.signed;
+		var bitchar = atob(signature);
+		var binSig = new Array(bitchar.length);
+		for (var i = 0; i < bitchar.length; i++) {
+		    binSig[i] = bitchar.charCodeAt(i);
+		}
 
 		delete secure.signed;
 
-		var signed = JSON.stringify(secure);
+		var signed = toBin(JSON.stringify(secure));
 
 
 		//region Decode existing Certificate
@@ -15955,8 +15976,8 @@
 			        name: "RSASSA-PKCS1-v1_5",
 			    },
 			    publicKey, 
-			    atob(signature), 
-			    new Uint8Array(certificate.tbs)
+			    binSig, 
+			    signed
 			)
 			.then(function(isvalid){
 			    //returns a boolean on whether the signature is true or not
