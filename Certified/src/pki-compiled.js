@@ -15915,20 +15915,65 @@
 	//*********************************************************************************
 	//endregion
 	//*********************************************************************************
-	//region Parse existing Certificate
+	//region Verify Certificate
 	//*********************************************************************************
-	function parseCertificate(strCERT)
+	function verifyCertificate(strCert,strPub)
 	{
 		
 		//region Decode existing Certificate
-		const stringPEM = strCERT.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
-		
+		const stringCertPEM = strCert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+		const stringPubPEM = strPub.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringPEM)));
-		return new pki.Certificate({ schema: asn1.result });
+		const certificate = new pki.Certificate({ schema: asn1.result });
+
+		window.crypto.subtle.importKey(
+		    "spki", 
+		    stringPubPEM,
+		    {   //these are the algorithm options
+		        name: "RSASSA-PKCS1-v1_5",
+		        hash: {name: "SHA-256"}, 
+		    },
+		    true, 
+		    ["verify"] 
+		)
+		.then(function(publicKey){
+		    window.crypto.subtle.verify(
+			    {
+			        name: "RSASSA-PKCS1-v1_5",
+			    },
+			    publicKey, 
+			    certificate.signatureValue, 
+			    tbs
+			)
+			.then(function(isvalid){
+			    //returns a boolean on whether the signature is true or not
+			    console.log(isvalid);
+			    return isvalid;
+			})
+			.catch(function(err){
+			    console.error(err);
+			});
+		})
+		.catch(function(err){
+		    console.error(err);
+		});
 		//endregion
 				
 	}
-
+	//*********************************************************************************
+	//region Parse public key
+	//*********************************************************************************
+	function parsePubKeyPEM(strPEM)
+	{
+		
+		//region Decode existing Certificate
+		const stringPEM = strPub.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+		
+		return stringPEM;
+		//endregion
+				
+	}
 	//*********************************************************************************
 	//region Parse existing PKCS#10
 	//*********************************************************************************
@@ -16214,7 +16259,7 @@
 	window.createPKCS10 = createPKCS10;
 	window.parsePKCS10 = parsePKCS10;
 	window.verifyPKCS10 = verifyPKCS10;
-	window.parseCertificate = parseCertificate;
+	window.verifyCertificate = verifyCertificate;
 	window.handleHashAlgOnChange = handleHashAlgOnChange;
 	window.handleSignAlgOnChange = handleSignAlgOnChange;
 
