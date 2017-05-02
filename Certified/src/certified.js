@@ -24,10 +24,7 @@ function retrieveKeyValue(key) {
 
 }
 
-var storeKeyValue = function(db,key,value) {
-	var store = new db('certified');
-    store.set(key,value, function (err) {if (err) throw err});   
-}
+
 
 window.generateCSR = generateCSR;
 window.generateRSAKeyPair = generateRSAKeyPair;

@@ -15,6 +15,11 @@ function storeKeys(keyPair) {
 	storeKeyValue(db,'private',keyPair.privateKey);
 }
 
+var storeKeyValue = function(db,key,value) {
+	var store = new db('certified');
+    store.set(key,value, function (err) {if (err) throw err});   
+}
+
 window.storeKeys = storeKeys;
 
 function definePersonaCSR(
