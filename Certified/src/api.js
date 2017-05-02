@@ -123,7 +123,7 @@ var createAccount = function(account,email,cb) {
 						      }
 						    }
 						};
-						http.send(data);
+						http.send(JSON.stringify(data));
 						//document.querySelector("#spkacWebID").value = csrStr;
 					});
 				}
