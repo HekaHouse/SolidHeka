@@ -15943,8 +15943,8 @@
 			        name: "RSASSA-PKCS1-v1_5",
 			    },
 			    publicKey, 
-			    certificate.signatureValue.toBER(), 
-			    certificate.tbs
+			    new Uint8Array(certificate.signatureValue), 
+			    new Uint8Array(certificate.tbs)
 			)
 			.then(function(isvalid){
 			    //returns a boolean on whether the signature is true or not
