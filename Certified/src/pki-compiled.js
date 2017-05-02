@@ -15924,7 +15924,7 @@
 		const stringCertPEM = strCert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 		const stringPubPEM = strPub.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 
-		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringPEM)));
+		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
 		const certificate = new pki.Certificate({ schema: asn1.result });
 
 		window.crypto.subtle.importKey(
@@ -15944,7 +15944,7 @@
 			    },
 			    publicKey, 
 			    certificate.signatureValue, 
-			    tbs
+			    certificate.tbs
 			)
 			.then(function(isvalid){
 			    //returns a boolean on whether the signature is true or not
