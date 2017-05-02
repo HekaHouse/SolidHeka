@@ -15929,8 +15929,8 @@
 
 
 		const publicKeyInfoSchema = certificate.subjectPublicKeyInfo.toSchema();
-		const publicKeyInfoBuffer = certificate.publicKeyInfoSchema.toBER(false);
-		const publicKeyInfoView = new certificate.Uint8Array(publicKeyInfoBuffer);
+		const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
+		const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
 		
 		window.crypto.subtle.importKey(
 		    "spki", 
