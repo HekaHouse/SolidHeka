@@ -15917,12 +15917,18 @@
 	//*********************************************************************************
 	//region Verify Certificate
 	//*********************************************************************************
-	function verifyCertificate(strCert,strPub)
+	function verifyCertificate(secure)
 	{
 		
+		var signature = secure.signed;
+
+		delete secure.signed;
+
+		var signed = JSON.stringify(secure);
+
 		//region Decode existing Certificate
-		const stringCertPEM = strCert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
-		const stringPubPEM = strPub.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+		const stringCertPEM = secure.cert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+		const stringPubPEM = secure.keys.public.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
 		const certificate = new pki.Certificate({ schema: asn1.result });
@@ -15948,8 +15954,8 @@
 			        name: "RSASSA-PKCS1-v1_5",
 			    },
 			    publicKey, 
-			    new Uint8Array(certificate.signatureValue.toBER()), 
-			    new Uint8Array(certificate.tbs)
+			    atob(signature), 
+			    atob(signed)
 			)
 			.then(function(isvalid){
 			    //returns a boolean on whether the signature is true or not
