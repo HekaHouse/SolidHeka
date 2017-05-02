@@ -199,8 +199,14 @@
 			var persona = document.querySelector(".account").value;
 			var email = document.querySelector(".address").value;
 			
-			createAccount(persona,email);
+			createAccount(persona,email, function(newAccount){
+				console.log(JSON.stringify(newAccount));
+				document.querySelector(".status").innerHTML = "yay!";
+			});
 		}
+		//*********************************************************************************
+		//endregion
+		//*********************************************************************************
    	</script>
   </head>
   <body>

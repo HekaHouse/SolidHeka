@@ -117,7 +117,7 @@ var createAccount = function(account,email,cb) {
 						http.onreadystatechange = function() {
 						    if (this.readyState == this.DONE) {
 						      if (this.status === 200) {
-								console.log('Account created at '+url);
+								cb(responseText);
 						      } else {
 						        console.log('Error creating account at '+url);
 						      }
