@@ -2,7 +2,7 @@
 	'use strict';
 
 	var certified = require('./certified');
-
+	var pki = require('pkijs');
 	var hashAlg = 'SHA-256';
 	var signAlg = 'RSASSA-PKCS1-V1_5';
 
