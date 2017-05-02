@@ -103,8 +103,8 @@ exports.generate = function(username,csrpem) {
   var signature = keys.privateKey.sign(md);
 
   var verified = keys.publicKey.verify(md.digest().bytes(), signature);
-
   console.log(verified);
+  console.log(signature);
   var signed = ab2str(signature);
 
   certObj.signed = signed;
