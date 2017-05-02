@@ -92,18 +92,18 @@ var requestPersona = function(persona,cb) {
 
 var createAccount = function(account,email,cb) {
 	if (account.length > 0) {
-		certified.generateRSAKeyPair()
+		generateRSAKeyPair()
 		.then(function(keyPair){			
 			storeKeys(keyPair);		
-			return certified.generateCSR(keyPair,db,definePersonaCSR());
+			return generateCSR(keyPair,db,definePersonaCSR(account));
 		})
 		.then(function(csr){			
-			certified.storeKeyValue(db,'csr',csr);				
+			storeKeyValue(db,'csr',csr);				
 			certified.verifyCSR(csr)
 			.then(function(verified){
 				console.log(verified);
 				if (verified) {
-					certified.parseCSR(csr)
+					parseCSR(csr)
 					.then(function(csrStruct){
 						return JSON.stringify(csrStruct);
 					})

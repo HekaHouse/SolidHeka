@@ -1,5 +1,5 @@
 
-exports.generateCSR = function(keyPair,db,csrStruct) {
+var generateCSR = function(keyPair,db,csrStruct) {
 	return createPKCS10(keyPair,db,csrStruct);
 }
 
@@ -11,7 +11,7 @@ exports.verifyCSR = function(csr) {
 	return verifyPKCS10(csr);
 }
 
-exports.generateRSAKeyPair = function() {
+var generateRSAKeyPair = function() {
 	return Promise.resolve().then(function() { return generateRSASSA_PKCS1_V1_5(); });
 }
 
@@ -24,8 +24,11 @@ function retrieveKeyValue(key) {
 
 }
 
-exports.storeKeyValue = function(db,key,value) {
+var storeKeyValue = function(db,key,value) {
 	var store = new db('certified');
     store.set(key,value, function (err) {if (err) throw err});   
 }
 
+window.generateCSR = generateCSR;
+window.generateRSAKeyPair = generateRSAKeyPair;
+window.storeKeyValue = storeKeyValue;
