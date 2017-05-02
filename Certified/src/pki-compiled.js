@@ -15929,7 +15929,7 @@
 
 		window.crypto.subtle.importKey(
 		    "spki", 
-		    stringPubPEM,
+		    stringToArrayBuffer(fromBase64(stringPubPEM)),
 		    {   //these are the algorithm options
 		        name: "RSASSA-PKCS1-v1_5",
 		        hash: {name: "SHA-256"}, 
