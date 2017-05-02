@@ -15926,6 +15926,7 @@
 
 		var signed = JSON.stringify(secure);
 
+
 		//region Decode existing Certificate
 		const stringCertPEM = secure.cert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 		const stringPubPEM = secure.keys.public.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
@@ -15955,7 +15956,7 @@
 			    },
 			    publicKey, 
 			    atob(signature), 
-			    atob(signed)
+			    new Uint8Array(certificate.tbs)
 			)
 			.then(function(isvalid){
 			    //returns a boolean on whether the signature is true or not
