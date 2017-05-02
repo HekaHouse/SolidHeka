@@ -31,4 +31,3 @@ var storeKeyValue = function(db,key,value) {
 
 window.generateCSR = generateCSR;
 window.generateRSAKeyPair = generateRSAKeyPair;
-window.storeKeyValue = storeKeyValue;

@@ -200,7 +200,9 @@
 			var email = document.querySelector(".address").value;
 			
 			createAccount(persona,email, function(newAccount){
-				console.log(JSON.stringify(newAccount));
+				var account = JSON.parse(newAccount);
+				console.log(account.created);
+				console.log(account.secure.cert);
 				document.querySelector(".status").innerHTML = "yay!";
 			});
 		}
