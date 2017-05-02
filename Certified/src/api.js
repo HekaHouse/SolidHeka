@@ -103,7 +103,7 @@ var createAccount = function(account,email,cb) {
 			.then(function(verified){
 				console.log(verified);
 				if (verified) {
-					parseCSR(csr)
+					certified.parseCSR(csr)
 					.then(function(csrStruct){
 						return JSON.stringify(csrStruct);
 					})
