@@ -197,28 +197,9 @@
 		//*********************************************************************************
 		var registerAccount = function() {
 			var persona = document.querySelector(".account").value;
-			certified.generateRSAKeyPair()
-			.then(function(keyPair){			
-				storeKeys(keyPair);		
-				return certified.generateCSR(keyPair,db,definePersonaCSR(persona));
-			})
-			.then(function(csr){			
-				storeKeyValue(db,'csr',csr);				
-				certified.verifyCSR(csr)
-				.then(function(verified){
-					console.log(verified);
-					if (verified) {
-						certified.parseCSR(csr)
-						.then(function(csrStruct){
-							return JSON.stringify(csrStruct);
-						})
-						.then(function(csrStr){
-							document.querySelector("#spkacWebID").value = csrStr;
-						});
-					}
-				});			
-			});			
-			createAccount(document.querySelector(".account").value,document.querySelector(".address").value);
+			var email = document.querySelector(".address").value;
+			
+			createAccount(persona,email);
 		}
    	</script>
   </head>
