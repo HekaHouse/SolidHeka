@@ -94,9 +94,8 @@ exports.generate = function(username,csrpem) {
 
   var verified = keys.publicKey.verify(md.digest().bytes(), signature);
   console.log(verified);
-  console.log(signature);
   var signed = orge.util.bytesToHex(signature);
-
+  console.log(signed);
   certObj.signed = signed;
 
   return certObj;
