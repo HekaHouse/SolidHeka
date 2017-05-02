@@ -15856,8 +15856,8 @@
 		sequence = sequence.then(() =>
 			{
 				
-				certified.storeKeyValue(db,'public',publicKey);
-				certified.storeKeyValue(db,'private',privateKey);				
+				storeKeyValue(db,'public',publicKey);
+				storeKeyValue(db,'private',privateKey);				
 			},
 			error => Promise.reject((`Error during key generation: ${error}`))
 		);
@@ -15908,7 +15908,7 @@
 			let resultString = "-----BEGIN CERTIFICATE REQUEST-----\r\n";
 			resultString = `${resultString}${strPem}`;
 			resultString = `${resultString}\r\n-----END CERTIFICATE REQUEST-----\r\n`;
-			certified.storeKeyValue(db,'csr',resultString);						
+			storeKeyValue(db,'csr',resultString);						
 
 			return resultString;
 		});
