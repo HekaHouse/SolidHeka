@@ -88,7 +88,7 @@ exports.generate = function(username,csrpem) {
 
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
-  var bin = toBin(JSON.stringify(certObj));
+  var bin = new Buffer(JSON.stringify(certObj), 'utf8');
   var signature = keys.privateKey.sign(bin);
 
   var verified = keys.publicKey.verify(bin, signature);
@@ -102,14 +102,7 @@ exports.generate = function(username,csrpem) {
   return certObj;
 }
 
-function toBin(str){
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i<strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return buf;
-}
+
 
 function parseHexString(str) { 
     var result = [];
