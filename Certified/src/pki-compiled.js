@@ -15930,11 +15930,7 @@
 	{
 		
 		var signature = secure.signed;
-		var bitchar = atob(signature);
-		var binSig = new Array(bitchar.length);
-		for (var i = 0; i < bitchar.length; i++) {
-		    binSig[i] = bitchar.charCodeAt(i);
-		}
+		var binSig = str2ab(signature);
 
 		delete secure.signed;
 
