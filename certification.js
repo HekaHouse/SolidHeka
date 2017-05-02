@@ -88,18 +88,61 @@ exports.generate = function(username,csrpem) {
 
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
-  var md = forge.md.sha1.create();
-  md.update(JSON.stringify(certObj), 'utf8');
-  var signature = keys.privateKey.sign(md);
+  var bin = toBin(JSON.stringify(certObj));
+  var signature = keys.privateKey.sign(bin);
 
-  var verified = keys.publicKey.verify(md.digest().bytes(), signature);
+  var verified = keys.publicKey.verify(bin, signature);
   console.log(verified);
-  var signed = forge.util.bytesToHex(signature);
+
+
+  var signed = createHexString(signature);
   console.log(signed);
   certObj.signed = signed;
 
   return certObj;
 }
 
+function toBin(str){
+ var st,i,j,d;
+ var arr = [];
+ var len = str.length;
+ for (i = 1; i<=len; i++){
+                //reverse so its like a stack
+  d = str.charCodeAt(len-i);
+  for (j = 0; j < 8; j++) {
+   st = d&#37;2 == '0' ? "class='zero'" : "" 
+   arr.push(d%2);
+   d = Math.floor(d/2);
+  }
+ }
+        //reverse all bits again.
+ return arr.reverse().join("");
+}
 
+function parseHexString(str) { 
+    var result = [];
+    while (str.length >= 8) { 
+        result.push(parseInt(str.substring(0, 8), 16));
+
+        str = str.substring(8, str.length);
+    }
+
+    return result;
+}
+
+function createHexString(arr) {
+    var result = "";
+    var z;
+
+    for (var i = 0; i < arr.length; i++) {
+        var str = arr[i].toString(16);
+
+        z = 8 - str.length + 1;
+        str = Array(z).join("0") + str;
+
+        result += str;
+    }
+
+    return result;
+}
 
