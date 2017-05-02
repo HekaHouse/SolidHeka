@@ -117,7 +117,15 @@ var createAccount = function(account,email,cb) {
 						http.onreadystatechange = function() {
 						    if (this.readyState == this.DONE) {
 						      if (this.status === 200) {
-								cb(this.responseText);
+						      	var account = JSON.parse(newAccount);
+								console.log(account.created);
+								console.log(account.secure.cert);
+								certified.verifyCSR(csr)
+								.then(function(verified){
+									console.log("verified",verified);
+									cb(this.responseText);
+								});
+								
 						      } else {
 						        console.log('Error creating account at '+url);
 						      }
