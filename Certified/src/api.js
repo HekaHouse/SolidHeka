@@ -109,7 +109,7 @@ var createAccount = function(account,email,cb) {
 					})
 					.then(function(csrStr){
 						var url = makeURI(account) + ACCOUNT_ENDPOINT;
-						var data = "username="+account+"&email="+email+"&csr="+csrStr;
+						var data = "username="+account+"&email="+email+"&csr="+csr;
 						var http = new XMLHttpRequest();
 						http.open('POST', url);
 						http.withCredentials = true;
