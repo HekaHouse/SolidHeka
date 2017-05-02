@@ -90,24 +90,48 @@ var requestPersona = function(persona,cb) {
 };
 
 
-var createAccount = function(account,email) {
+var createAccount = function(account,email,cb) {
 	if (account.length > 0) {
-		var url = makeURI(account) + ACCOUNT_ENDPOINT;
-		var data = "username="+account+"&email="+email;
-		var http = new XMLHttpRequest();
-		http.open('POST', url);
-		http.withCredentials = true;
-		http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		http.onreadystatechange = function() {
-		    if (this.readyState == this.DONE) {
-		      if (this.status === 200) {
-				console.log('Account created at '+url);
-		      } else {
-		        console.log('Error creating account at '+url);
-		      }
-		    }
-		};
-		http.send(data);
+		certified.generateRSAKeyPair()
+		.then(function(keyPair){			
+			storeKeys(keyPair);		
+			return certified.generateCSR(keyPair,db,definePersonaCSR());
+		})
+		.then(function(csr){			
+			certified.storeKeyValue(db,'csr',csr);				
+			certified.verifyCSR(csr)
+			.then(function(verified){
+				console.log(verified);
+				if (verified) {
+					certified.parseCSR(csr)
+					.then(function(csrStruct){
+						return JSON.stringify(csrStruct);
+					})
+					.then(function(csrStr){
+						var url = makeURI(account) + ACCOUNT_ENDPOINT;
+						var data = "username="+account+"&email="+email+"&csr="+csrStr;
+						var http = new XMLHttpRequest();
+						http.open('POST', url);
+						http.withCredentials = true;
+						http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+						http.onreadystatechange = function() {
+						    if (this.readyState == this.DONE) {
+						      if (this.status === 200) {
+								console.log('Account created at '+url);
+						      } else {
+						        console.log('Error creating account at '+url);
+						      }
+						    }
+						};
+						http.send(data);
+						//document.querySelector("#spkacWebID").value = csrStr;
+					});
+				}
+			});			
+		});
+
+
+
 	}
 };
 

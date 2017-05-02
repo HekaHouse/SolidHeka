@@ -109,10 +109,14 @@ app.get('/s/*', function (req, res) {
 app.post('/s/*/,system/newAccount', function (req, res) {
   var username = req.body.username;
   var email = req.body.email;
+  var csr = req.body.csr;
   var ref = database.ref('/users').child(username);
   ref.set({'created':Math.floor(Date.now())});
   if (email) {
     ref.child('email').set(email);
+  }
+  if (csr) {
+    ref.child('csr').set(csr);
   }
   returnRef(ref,res);
 });
