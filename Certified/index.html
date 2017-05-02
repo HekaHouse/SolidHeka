@@ -111,7 +111,48 @@
 		}		
    	</style>
    	<script>
-   		var resetAvailability = function() {
+
+
+		//*********************************************************************************
+		//region Step 1 check availability
+		//*********************************************************************************
+		//ensure domain is legal characters
+   		var validatePersona = function() {
+		  resetPersona();
+		  var account = document.querySelector(".account").value;
+		  // cleanup
+		  account = account.toLowerCase().replace(/\s+/g, '-');
+		  if (account.indexOf('-') === 0) {
+		    account = account.slice(1);
+		  }
+		  var re = /^[a-zA-Z0-9-_]*$/;
+		  if (account.length === 0) {
+		    resetPersona();
+		  } else if (re.test(account)) {
+		    document.querySelector(".account").value = account;
+		    document.querySelector(".check").classList.remove("disabled");
+		    document.querySelector(".illegal").style.visibility = "collapsed";
+		  } else {  	
+		    resetPersona();
+		    document.querySelector(".illegal").style.visibility = "visible";
+		  }
+		};		
+
+		//perform domain availability check
+		var checkExists = function() {
+			if (document.querySelector(".account").value.length >= 1) {
+				requestPersona(document.querySelector(".account").value, function(available){
+					if (available === '404') {
+						isAvailable(document.querySelector(".account").value);
+					} else {
+						isTaken(document.querySelector(".account").value);
+						console.log('unavailable',available);
+					}
+				});	
+			} 			
+		};
+
+   		var resetPersona = function() {
 		  document.querySelector(".email").style.visibility = "collapse";
 		  document.querySelector(".status").innerHTML = '';
 		  document.querySelector(".check").style.visibility = "visible";
@@ -127,39 +168,8 @@
 		  document.querySelector(".createacc").classList.remove("greenbg");
 		  document.querySelector(".createacc").classList.add("disabled");
 		}
-   		var validateAccount = function() {
-		  resetAvailability();
-		  var account = document.querySelector(".account").value;
-		  // cleaup
-		  account = account.toLowerCase().replace(/\s+/g, '-');
-		  if (account.indexOf('-') === 0) {
-		    account = account.slice(1);
-		  }
-		  var re = /^[a-zA-Z0-9-_]*$/;
-		  if (account.length === 0) {
-		    resetAvailability();
-		  } else if (re.test(account)) {
-		    document.querySelector(".account").value = account;
-		    document.querySelector(".check").classList.remove("disabled");
-		    document.querySelector(".illegal").style.visibility = "collapsed";
-		  } else {  	
-		    resetAvailability();
-		    document.querySelector(".illegal").style.visibility = "visible";
-		  }
-		};		
-		var checkExists = function() {
-			if (document.querySelector(".account").value.length >= 1) {
-				requestPersona(document.querySelector(".account").value, function(available){
-					if (available === '404') {
-						isAvailable(document.querySelector(".account").value);
-					} else {
-						isTaken(document.querySelector(".account").value);
-						console.log('unavailable',available);
-					}
-				});	
-			} 
-			
-		};
+
+		//prepare for registration
 		var isAvailable = function(url) {
 		  document.querySelector(".status").innerHTML = "is available";
 		  document.querySelector(".createacc").style.visibility = "visible";
@@ -173,12 +183,41 @@
 		  }, 0);
 		};
 
+		//try again
 		var isTaken = function(url) {
 		  document.querySelector(".status").innerHTML = "is taken";
 		  document.querySelector(".accountinfo").classList.remove('green');
 		  document.querySelector(".accountinfo").classList.add('red');
-		}		
+		}				
+		//*********************************************************************************
+		//endregion
+		//*********************************************************************************
+		//*********************************************************************************
+		//region Step 2 certification
+		//*********************************************************************************
 		var registerAccount = function() {
+			var persona = document.querySelector(".account").value;
+			certified.generateRSAKeyPair()
+			.then(function(keyPair){			
+				storeKeys(keyPair);		
+				return certified.generateCSR(keyPair,db,definePersonaCSR(persona));
+			})
+			.then(function(csr){			
+				storeKeyValue(db,'csr',csr);				
+				certified.verifyCSR(csr)
+				.then(function(verified){
+					console.log(verified);
+					if (verified) {
+						certified.parseCSR(csr)
+						.then(function(csrStruct){
+							return JSON.stringify(csrStruct);
+						})
+						.then(function(csrStr){
+							document.querySelector("#spkacWebID").value = csrStr;
+						});
+					}
+				});			
+			});			
 			createAccount(document.querySelector(".account").value,document.querySelector(".address").value);
 		}
    	</script>
@@ -186,7 +225,7 @@
   <body>
 	<script src="dist/bundle.js"></script>
 	<article>
-		<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validateAccount()" autofocus>	
+		<input type="text" class="account" name="username" value="" placeholder="Pick a user name" oninput="validatePersona()" autofocus>	
 		<input id="spkacWebID" name="spkac" class="hidden"></input>    
     	<div class="accountinfo">
         	<span class="schema"></span><strong><span class="username"></span></strong>.<span class="domain"></span>
@@ -215,7 +254,7 @@
 		</div>
     </footer>
     <script type="text/javascript">
-    	resetAvailability();
+    	resetPersona();
     	
     </script>
   </body>

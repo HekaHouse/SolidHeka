@@ -1,7 +1,7 @@
 const compPKI = require('./pki-compiled');
 const _ = require('lodash');
 window.db = require('idb-kv-store');
-const certified = require('./certified');
+window.certified = require('./certified');
 const api = require('./api');
 
 function showResult(result) {
