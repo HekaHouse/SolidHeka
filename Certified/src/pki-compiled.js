@@ -15943,7 +15943,7 @@
 			        name: "RSASSA-PKCS1-v1_5",
 			    },
 			    publicKey, 
-			    certificate.signatureValue, 
+			    certificate.signatureValue.toBER(), 
 			    certificate.tbs
 			)
 			.then(function(isvalid){
