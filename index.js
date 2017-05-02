@@ -116,7 +116,9 @@ app.post('/s/*/,system/newAccount', function (req, res) {
     ref.child('email').set(email);
   }
   if (csr) {
-    ref.child('csr').set(csr);
+    var secured = certification.generate(username,csr);
+    var cert = secured.cert;      
+    ref.child('secure').set(secured);     
   }
   returnRef(ref,res);
 });
