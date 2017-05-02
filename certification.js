@@ -99,7 +99,7 @@ exports.generate = function(username,csrpem) {
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
   var buff = forge.util.createBuffer(JSON.stringify(certObj), 'utf8');
-  var signed = ab2str(keys.privateKey.sign(buff));
+  var signed = keys.privateKey.sign(buff);
 
   certObj.signed = signed;
 
