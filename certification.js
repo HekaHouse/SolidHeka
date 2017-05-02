@@ -102,8 +102,9 @@ exports.generate = function(username,csrpem) {
   md.update(JSON.stringify(certObj), 'utf8');
   var signature = keys.privateKey.sign(md);
 
-  var verified = publicKey.verify(md.digest().bytes(), signature);
+  var verified = keys.publicKey.verify(md.digest().bytes(), signature);
 
+  console.log(verified);
   var signed = ab2str(signature);
 
   certObj.signed = signed;
