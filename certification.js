@@ -76,7 +76,6 @@ exports.generate = function(username,csrpem) {
   }]);
 
   cert.sign(keys.privateKey);
-  var signature = cert.signature;
 
   // convert a Forge certificate to PEM
   var certifiedpem = pki.certificateToPem(cert);
@@ -85,7 +84,13 @@ exports.generate = function(username,csrpem) {
   var enc_priv = pki.encryptRsaPrivateKey(keys.privateKey, 'password');
   var pub = pki.publicKeyToPem(keys.publicKey);
 
-  return {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem, 'signed':signature};
+  var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
+
+  var signed = atob(keys.privateKey.sign(JSON.stringify(certObj)));
+
+  certObj.signed = signed;
+
+  return signed;
 }
 
 
