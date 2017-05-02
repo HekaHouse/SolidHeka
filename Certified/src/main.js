@@ -11,9 +11,11 @@ function showResult(result) {
 }
 
 function storeKeys(keyPair) {
-	certified.storeKeyValue(db,'public',keyPair.publicKey);
-	certified.storeKeyValue(db,'private',keyPair.privateKey);
+	storeKeyValue(db,'public',keyPair.publicKey);
+	storeKeyValue(db,'private',keyPair.privateKey);
 }
+
+window.storeKeys = storeKeys;
 
 function definePersonaCSR(
 	persona='o',
