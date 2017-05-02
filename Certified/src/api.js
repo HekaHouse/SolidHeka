@@ -109,11 +109,11 @@ var createAccount = function(account,email,cb) {
 					})
 					.then(function(csrStr){
 						var url = makeURI(account) + ACCOUNT_ENDPOINT;
-						var data = "username="+account+"&email="+email+"&csr="+csr;
+						var data = {"username":account,"email":email,"csr":csr};
 						var http = new XMLHttpRequest();
 						http.open('POST', url);
 						http.withCredentials = true;
-						http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+						http.setRequestHeader("Content-Type", "application/json");
 						http.onreadystatechange = function() {
 						    if (this.readyState == this.DONE) {
 						      if (this.status === 200) {
