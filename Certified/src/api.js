@@ -120,6 +120,8 @@ var createAccount = function(account,email,cb) {
 						      	var account = JSON.parse(this.responseText);
 								console.log(account.created);
 								console.log(account.secure.cert);
+								
+    							var certificate = parseCertificate(account.secure.cert);
 								certified.verifyCSR(csr)
 								.then(function(verified){
 									console.log("verified",verified);

@@ -15916,6 +15916,21 @@
 	//*********************************************************************************
 	//endregion
 	//*********************************************************************************
+	//region Parse existing Certificate
+	//*********************************************************************************
+	function parseCertificate(strCERT)
+	{
+		
+		//region Decode existing Certificate
+		const stringPEM = strCERT.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
+		
+		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringPEM)));
+		return new Certificate({ schema: asn1.result });
+		//endregion
+				
+	}
+
+	//*********************************************************************************
 	//region Parse existing PKCS#10
 	//*********************************************************************************
 	function parsePKCS10(strCSR)
@@ -16200,6 +16215,7 @@
 	window.createPKCS10 = createPKCS10;
 	window.parsePKCS10 = parsePKCS10;
 	window.verifyPKCS10 = verifyPKCS10;
+	window.parseCertificate = parseCertificate;
 	window.handleHashAlgOnChange = handleHashAlgOnChange;
 	window.handleSignAlgOnChange = handleSignAlgOnChange;
 
