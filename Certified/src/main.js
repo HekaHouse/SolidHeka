@@ -21,7 +21,7 @@ var storeKeyValue = function(db,key,value) {
 }
 
 window.storeKeys = storeKeys;
-
+window.storeKeyValue = storeKeyValue;
 function definePersonaCSR(
 	persona='o',
 	host='heka.house',
