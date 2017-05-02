@@ -1,4 +1,4 @@
-const pki = require('pkijs');
+window.pki = require('pkijs');
 const compPKI = require('./pki-compiled');
 const _ = require('lodash');
 window.db = require('idb-kv-store');
