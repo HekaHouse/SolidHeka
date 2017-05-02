@@ -15918,20 +15918,13 @@
 	//region Verify Certificate
 	//*********************************************************************************
 
-	function toBin(str){
-	 var st,i,j,d;
-	 var arr = [];
-	 var len = str.length;
-	 for (i = 1; i<=len; i++){
-	                //reverse so its like a stack
-	  d = str.charCodeAt(len-i);
-	  for (j = 0; j < 8; j++) {
-	   arr.push(d%2);
-	   d = Math.floor(d/2);
+	function str2ab(str) {
+	  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+	  var bufView = new Uint16Array(buf);
+	  for (var i=0, strLen=str.length; i<strLen; i++) {
+	    bufView[i] = str.charCodeAt(i);
 	  }
-	 }
-	        //reverse all bits again.
-	 return arr.reverse().join("");
+	  return buf;
 	}
 	function verifyCertificate(secure)
 	{
@@ -15945,7 +15938,7 @@
 
 		delete secure.signed;
 
-		var signed = toBin(JSON.stringify(secure));
+		var signed = str2ab(JSON.stringify(secure));
 
 
 		//region Decode existing Certificate
