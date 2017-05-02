@@ -2,7 +2,6 @@
 	'use strict';
 
 	var certified = require('./certified');
-	var pki = require('pkijs');
 	var hashAlg = 'SHA-256';
 	var signAlg = 'RSASSA-PKCS1-V1_5';
 
@@ -15925,7 +15924,7 @@
 		const stringPEM = strCERT.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 		
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringPEM)));
-		return new Certificate({ schema: asn1.result });
+		return new pki.Certificate({ schema: asn1.result });
 		//endregion
 				
 	}
