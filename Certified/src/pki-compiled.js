@@ -15927,9 +15927,14 @@
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
 		const certificate = new pki.Certificate({ schema: asn1.result });
 
+
+		const publicKeyInfoSchema = certificate.subjectPublicKeyInfo.toSchema();
+		const publicKeyInfoBuffer = certificate.publicKeyInfoSchema.toBER(false);
+		const publicKeyInfoView = new certificate.Uint8Array(publicKeyInfoBuffer);
+		
 		window.crypto.subtle.importKey(
 		    "spki", 
-		    stringToArrayBuffer(fromBase64(stringPubPEM)),
+		    publicKeyInfoView,
 		    {   //these are the algorithm options
 		        name: "RSASSA-PKCS1-v1_5",
 		        hash: {name: "SHA-256"}, 
