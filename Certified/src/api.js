@@ -117,13 +117,13 @@ var createAccount = function(account,email,cb) {
 						http.onreadystatechange = function() {
 						    if (this.readyState == this.DONE) {
 						      if (this.status === 200) {
-						      	var account = JSON.parse(newAccount);
+						      	var account = JSON.parse(this.responseText);
 								console.log(account.created);
 								console.log(account.secure.cert);
 								certified.verifyCSR(csr)
 								.then(function(verified){
 									console.log("verified",verified);
-									cb(this.responseText);
+									cb(account);
 								});
 								
 						      } else {
