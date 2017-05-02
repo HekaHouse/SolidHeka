@@ -1,17 +1,7 @@
 var forge = require('node-forge');
 var pki = forge.pki;
 
-function ab2str(buf) {
-  return String.fromCharCode.apply(null, new Uint16Array(buf));
-}
-function str2ab(str) {
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i < strLen; i++) {
-    bufView[i] = str.charCodeAt(i);
-  }
-  return buf;
-}
+
 
 exports.generate = function(username,csrpem) {
   var csr = forge.pki.certificationRequestFromPem(csrpem);
@@ -105,7 +95,7 @@ exports.generate = function(username,csrpem) {
   var verified = keys.publicKey.verify(md.digest().bytes(), signature);
   console.log(verified);
   console.log(signature);
-  var signed = ab2str(signature);
+  var signed = orge.util.bytesToHex(signature);
 
   certObj.signed = signed;
 
