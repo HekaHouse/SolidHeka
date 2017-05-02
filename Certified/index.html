@@ -178,7 +178,9 @@
 		  document.querySelector(".accountinfo").classList.remove('green');
 		  document.querySelector(".accountinfo").classList.add('red');
 		}		
-
+		var registerAccount = function() {
+			createAccount(document.querySelector(".account").value,document.querySelector(".address").value);
+		}
    	</script>
   </head>
   <body>
@@ -204,7 +206,7 @@
       </article>   
     <footer>
 		<div class="buttons center">
-			<a href="#" class="createacc button greenbg" onclick="createAccount()">Create account</a>
+			<a href="#" class="createacc button greenbg" onclick="registerAccount()">Create account</a>
 			<a href="#" class="check button" onclick="checkExists()">Check availability</a>
 			<a href="#" class="update button" onclick="updateProfile()">Update profile (or skip)</a>
 			<a href="#" class="issue button" onclick="createPKCS10()">Generate keys and finish</a>
