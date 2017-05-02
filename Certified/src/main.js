@@ -37,6 +37,8 @@ function definePersonaCSR(
 	};
 }
 
+window.definePersonaCSR = definePersonaCSR;
+
 // certified.generateRSAKeyPair()
 // 		.then(function(keyPair){			
 // 			storeKeys(keyPair);		
