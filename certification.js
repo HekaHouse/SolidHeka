@@ -75,7 +75,8 @@ exports.generate = function(username,csrpem) {
     name: 'subjectKeyIdentifier'
   }]);
 
-  var signature = cert.sign(keys.privateKey);
+  cert.sign(keys.privateKey);
+  var signature = cert.signature;
 
   // convert a Forge certificate to PEM
   var certifiedpem = pki.certificateToPem(cert);
