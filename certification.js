@@ -1,6 +1,18 @@
 var forge = require('node-forge');
 var pki = forge.pki;
 
+function ab2str(buf) {
+  return String.fromCharCode.apply(null, new Uint8Array(buf));
+}
+function str2ab(str) {
+  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  var bufView = new Uint8Array(buf);
+  for (var i=0, strLen=str.length; i < strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
+
 exports.generate = function(username,csrpem) {
   var csr = forge.pki.certificationRequestFromPem(csrpem);
   // generate a keypair and create an X.509v3 certificate
@@ -86,7 +98,7 @@ exports.generate = function(username,csrpem) {
 
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
-  var signed = atob(keys.privateKey.sign(JSON.stringify(certObj)));
+  var signed = ab2str(keys.privateKey.sign(JSON.stringify(certObj)));
 
   certObj.signed = signed;
 
