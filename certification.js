@@ -110,7 +110,7 @@ function toBin(str){
                 //reverse so its like a stack
   d = str.charCodeAt(len-i);
   for (j = 0; j < 8; j++) {
-   st = d&#37;2 == '0' ? "class='zero'" : "" 
+   st = d % 2 == '0' ? "class='zero'" : "" 
    arr.push(d%2);
    d = Math.floor(d/2);
   }
