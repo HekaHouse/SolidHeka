@@ -98,14 +98,16 @@ exports.generate = function(username,csrpem) {
 
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
-  
-  var signature = keys.privateKey.sign(JSON.stringify(certObj).getBytes());
+  var md = forge.md.sha256.create();
+  md.update(JSON.stringify(certObj));
 
-  var verified = keys.publicKey.verify(JSON.stringify(certObj).getBytes(), signature);
+  var signature = keys.privateKey.sign(md.digest().getBytes());
+
+  var verified = keys.publicKey.verify(md.digest().getBytes(), signature);
   console.log(verified);
 
 
-  var signed = createHexString(signature);
+  var signed = forge.util.encode64(signature);
   console.log(signed);
   certObj.signed = signed;
 
@@ -114,30 +116,5 @@ exports.generate = function(username,csrpem) {
 
 
 
-function parseHexString(str) { 
-    var result = [];
-    while (str.length >= 8) { 
-        result.push(parseInt(str.substring(0, 8), 16));
 
-        str = str.substring(8, str.length);
-    }
-
-    return result;
-}
-
-function createHexString(arr) {
-    var result = "";
-    var z;
-
-    for (var i = 0; i < arr.length; i++) {
-        var str = arr[i].toString(16);
-
-        z = 8 - str.length + 1;
-        str = Array(z).join("0") + str;
-
-        result += str;
-    }
-
-    return result;
-}
 
