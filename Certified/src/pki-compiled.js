@@ -15943,8 +15943,6 @@
 		const certificate = new pki.Certificate({ schema: asn1_cert.result });
 
 
-		const asn1_pubkey = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
-		const pubkey = new pki.RSAPublicKey({ schema: asn1_pubkey.result });
 
 		const cert_signature = certificate.signatureValue;
 		const tbs = certificate.tbs;
