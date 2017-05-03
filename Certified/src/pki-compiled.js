@@ -15934,8 +15934,6 @@
 
 		delete secure.signed;
 
-		var signed = await sha256(JSON.stringify(secure));
-
 
 		//region Decode existing Certificate
 		const stringCertPEM = secure.cert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
@@ -15960,22 +15958,25 @@
 		    ["verify"] 
 		)
 		.then(function(publicKey){
-		    window.crypto.subtle.verify(
-			    {
-			        name: "RSASSA-PKCS1-v1_5",
-			    },
-			    publicKey, 
-			    binSig, 
-			    signed
-			)
-			.then(function(isvalid){
-			    //returns a boolean on whether the signature is true or not
-			    console.log(isvalid);
-			    return isvalid;
-			})
-			.catch(function(err){
-			    console.error(err);
-			});
+			sha256(JSON.stringify(secure)).then(hash => 
+
+			    window.crypto.subtle.verify(
+				    {
+				        name: "RSASSA-PKCS1-v1_5",
+				    },
+				    publicKey, 
+				    binSig, 
+				    hash
+				)
+				.then(function(isvalid){
+				    //returns a boolean on whether the signature is true or not
+				    console.log(isvalid);
+				    return isvalid;
+				})
+				.catch(function(err){
+				    console.error(err);
+				});
+			);
 		})
 		.catch(function(err){
 		    console.error(err);
