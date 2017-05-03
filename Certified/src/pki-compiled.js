@@ -15939,50 +15939,58 @@
 		const stringCertPEM = secure.cert.replace(/(-----(BEGIN|END) CERTIFICATE-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 		const stringPubPEM = secure.keys.public.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 
-		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
-		const certificate = new pki.Certificate({ schema: asn1.result });
+		const asn1_cert = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
+		const certificate = new pki.Certificate({ schema: asn1_cert.result });
+
+
+		const asn1_pubkey = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
+		const pubkey = new pki.RSAPublicKey({ schema: asn1_pubkey.result });
 
 		const cert_signature = certificate.signatureValue;
 		const tbs = certificate.tbs;
 
-		const publicKeyInfoSchema = certificate.subjectPublicKeyInfo.toSchema();
-		const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
-		const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
-		
-		window.crypto.subtle.importKey(
-		    "spki", 
-		    publicKeyInfoView,
-		    {   //these are the algorithm options
-		        name: "RSASSA-PKCS1-v1_5",
-		        hash: {name: "SHA-256"}, 
-		    },
-		    true, 
-		    ["verify"] 
-		)
-		.then(function(publicKey){
-			sha256(JSON.stringify(secure)).then(hash => {
-
-			    window.crypto.subtle.verify(
-				    {
-				        name: "RSASSA-PKCS1-v1_5",
-				    },
-				    publicKey, 
-				    new Uint8Array(cert_signature.valueBlock.valueHex), 
-				    new Uint8Array(tbs)
-				)
-				.then(function(isvalid){
-				    //returns a boolean on whether the signature is true or not
-				    console.log(isvalid);
-				    return isvalid;
-				})
-				.catch(function(err){
-				    console.error(err);
-				});
-			});
+		certificate.verify(certificate).then(function(verified){
+			console.log('verified',verified);
 		})
-		.catch(function(err){
-		    console.error(err);
-		});
+
+		// const publicKeyInfoSchema = certificate.subjectPublicKeyInfo.toSchema();
+		// const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
+		// const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
+		
+		// window.crypto.subtle.importKey(
+		//     "spki", 
+		//     publicKeyInfoView,
+		//     {   //these are the algorithm options
+		//         name: "RSASSA-PKCS1-v1_5",
+		//         hash: {name: "SHA-256"}, 
+		//     },
+		//     true, 
+		//     ["verify"] 
+		// )
+		// .then(function(publicKey){
+		// 	sha256(JSON.stringify(secure)).then(hash => {
+
+		// 	    window.crypto.subtle.verify(
+		// 		    {
+		// 		        name: "RSASSA-PKCS1-v1_5",
+		// 		    },
+		// 		    publicKey, 
+		// 		    new Uint8Array(cert_signature.valueBlock.valueHex), 
+		// 		    new Uint8Array(tbs)
+		// 		)
+		// 		.then(function(isvalid){
+		// 		    //returns a boolean on whether the signature is true or not
+		// 		    console.log(isvalid);
+		// 		    return isvalid;
+		// 		})
+		// 		.catch(function(err){
+		// 		    console.error(err);
+		// 		});
+		// 	});
+		// })
+		// .catch(function(err){
+		//     console.error(err);
+		// });
 		//endregion
 				
 	}
