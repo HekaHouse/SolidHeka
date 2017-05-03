@@ -101,7 +101,7 @@ exports.generate = function(username,csrpem) {
   var md = forge.md.sha256.create();
   md.update(JSON.stringify(certObj));
 
-  var signature = keys.privateKey.sign(md.digest());
+  var signature = keys.privateKey.sign(md);
 
   var verified = keys.publicKey.verify(md.digest().getBytes(), signature);
   console.log(verified);
