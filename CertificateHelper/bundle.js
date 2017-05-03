@@ -1,6 +1,8 @@
 (function () {
 	'use strict';
 
+	var WebCrypto = require("node-webcrypto-ossl");
+
 	//**************************************************************************************
 	/**
 	 * Get value for input parameters, or set a default value
@@ -9125,8 +9127,8 @@
 	{
 		if(engine.subtle !== null)
 			return engine.subtle;
-		
-		return undefined;
+		else 
+			return new WebCrypto().subtle;
 	}
 	//**************************************************************************************
 	/**
@@ -19615,17 +19617,18 @@
 		}, error => Promise.reject(`Error signing PKCS#10: ${error}`));
 	}
 	//*********************************************************************************
-	function createPKCS10()
+	function createPKCS10(keyPair,csrStruct)
 	{
-		return Promise.resolve().then(() => createPKCS10Internal()).then(() =>
-		{
+		return Promise.resolve().then(() => createPKCS10Internal(keyPair,csrStruct)).then(() =>
+		{			
 			let resultString = "-----BEGIN CERTIFICATE REQUEST-----\r\n";
 			resultString = `${resultString}${formatPEM(toBase64(arrayBufferToString(pkcs10Buffer)))}`;
 			resultString = `${resultString}\r\n-----END CERTIFICATE REQUEST-----\r\n`;
 			
-			document.getElementById("pem-text-block").value = resultString;
+			//storeKeyValue(db,'csr',resultString);
+			console.log(resultString);
 			
-			parsePKCS10();
+			parsePKCS10(resultString);
 		});
 	}
 	//*********************************************************************************
@@ -19633,18 +19636,10 @@
 	//*********************************************************************************
 	//region Parse existing PKCS#10
 	//*********************************************************************************
-	function parsePKCS10()
+	function parsePKCS10(csr)
 	{
-		//region Initial activities
-		document.getElementById("pkcs10-subject").innerHTML = "";
-		document.getElementById("pkcs10-exten").innerHTML = "";
-		
-		document.getElementById("pkcs10-data-block").style.display = "none";
-		document.getElementById("pkcs10-attributes").style.display = "none";
-		//endregion
-		
 		//region Decode existing PKCS#10
-		const stringPEM = document.getElementById("pem-text-block").value.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "");
+		const stringPEM = csr.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "").replace(/\r?\n|\r/g,'');
 		
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64((stringPEM))));
 		const pkcs10 = new CertificationRequest({ schema: asn1.result });
@@ -19672,11 +19667,7 @@
 				typeval = pkcs10.subject.typesAndValues[i].type;
 			
 			const subjval = pkcs10.subject.typesAndValues[i].value.valueBlock.value;
-			const ulrow = `<li><p><span>${typeval}</span> ${subjval}</p></li>`;
-			
-			document.getElementById("pkcs10-subject").innerHTML = document.getElementById("pkcs10-subject").innerHTML + ulrow;
-			if(typeval === "CN")
-				document.getElementById("pkcs10-subject-cn").innerHTML = subjval;
+			console.log(typeval,subjval);
 		}
 		//endregion
 		
@@ -19698,7 +19689,7 @@
 			publicKeySize = modulusBitLength.toString();
 		}
 		
-		document.getElementById("keysize").innerHTML = publicKeySize;
+		
 		//endregion
 		
 		//region Put information about signature algorithm
@@ -19723,7 +19714,7 @@
 		else
 			signatureAlgorithm = `${signatureAlgorithm} (${pkcs10.signatureAlgorithm.algorithmId})`;
 		
-		document.getElementById("sig-algo").innerHTML = signatureAlgorithm;
+		
 		//endregion
 		
 		//region Put information about PKCS#10 attributes
@@ -19754,16 +19745,14 @@
 					else
 						subjval = subjval + ((subjval.length === 0) ? "" : ";") + pkcs10.attributes[i].values[j].constructor.blockName();
 				}
-				
-				const ulrow = `<li><p><span>${typeval}</span> ${subjval}</p></li>`;
-				document.getElementById("pkcs10-exten").innerHTML = document.getElementById("pkcs10-exten").innerHTML + ulrow;
+								
 			}
 			
-			document.getElementById("pkcs10-attributes").style.display = "block";
+			
 		}
 		//endregion
 		
-		document.getElementById("pkcs10-data-block").style.display = "block";
+		
 	}
 	//*********************************************************************************
 	//endregion
@@ -19782,17 +19771,17 @@
 		//endregion
 	}
 	//*********************************************************************************
-	function verifyPKCS10()
+	function verifyPKCS10(csr)
 	{
 		return Promise.resolve().then(() =>
-		{
-			pkcs10Buffer = stringToArrayBuffer(fromBase64(document.getElementById("pem-text-block").value.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "")));
+		{			
+			pkcs10Buffer = stringToArrayBuffer(fromBase64(csr.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "")));
 		}).then(() => verifyPKCS10Internal()).then(result =>
 		{
-			alert(`Verification passed: ${result}`);
+			return result;
 		}, error =>
 		{
-			alert(`Error during verification: ${error}`);
+			console.log('Error during verification:', error);
 		});
 	}
 	//*********************************************************************************
@@ -19805,26 +19794,11 @@
 		//region Initial check
 		if(certificateBuffer.byteLength === 0)
 		{
-			alert("Nothing to parse!");
+			console.log("Nothing to parse!");
 			return;
 		}
 		//endregion
-		
-		//region Initial activities
-		document.getElementById("cert-extn-div").style.display = "none";
-		
-		const issuerTable = document.getElementById("cert-issuer-table");
-		while(issuerTable.rows.length > 1)
-			issuerTable.deleteRow(issuerTable.rows.length - 1);
-		
-		const subjectTable = document.getElementById("cert-subject-table");
-		while(subjectTable.rows.length > 1)
-			subjectTable.deleteRow(subjectTable.rows.length - 1);
-		
-		const extensionTable = document.getElementById("cert-extn-table");
-		while(extensionTable.rows.length > 1)
-			extensionTable.deleteRow(extensionTable.rows.length - 1);
-		//endregion
+	
 		
 		//region Decode existing X.509 certificate
 		const asn1 = fromBER(certificateBuffer);
@@ -19854,11 +19828,7 @@
 			
 			const subjval = typeAndValue.value.valueBlock.value;
 			
-			const row = issuerTable.insertRow(issuerTable.rows.length);
-			const cell0 = row.insertCell(0);
-			cell0.innerHTML = typeval;
-			const cell1 = row.insertCell(1);
-			cell1.innerHTML = subjval;
+			console.log(typeval,subjval);
 		}
 		//endregion
 		
@@ -19871,25 +19841,10 @@
 			
 			const subjval = typeAndValue.value.valueBlock.value;
 			
-			const row = subjectTable.insertRow(subjectTable.rows.length);
-			const cell0 = row.insertCell(0);
-			cell0.innerHTML = typeval;
-			const cell1 = row.insertCell(1);
-			cell1.innerHTML = subjval;
+			console.log(typeval,subjval);
 		}
 		//endregion
 		
-		//region Put information about X.509 certificate serial number
-		document.getElementById("cert-serial-number").innerHTML = bufferToHexCodes(certificate.serialNumber.valueBlock.valueHex);
-		//endregion
-		
-		//region Put information about issuance date
-		document.getElementById("cert-not-before").innerHTML = certificate.notBefore.value.toString();
-		//endregion
-		
-		//region Put information about expiration date
-		document.getElementById("cert-not-after").innerHTML = certificate.notAfter.value.toString();
-		//endregion
 		
 		//region Put information about subject public key size
 		let publicKeySize = "< unknown >";
@@ -19909,8 +19864,7 @@
 			
 			publicKeySize = modulusBitLength.toString();
 		}
-		
-		document.getElementById("cert-keysize").innerHTML = publicKeySize;
+				
 		//endregion
 		
 		//region Put information about signature algorithm
@@ -19935,23 +19889,10 @@
 			signatureAlgorithm = certificate.signatureAlgorithm.algorithmId;
 		else
 			signatureAlgorithm = `${signatureAlgorithm} (${certificate.signatureAlgorithm.algorithmId})`;
-		
-		document.getElementById("cert-sign-algo").innerHTML = signatureAlgorithm;
+				
 		//endregion
 		
-		//region Put information about certificate extensions
-		if("extensions" in certificate)
-		{
-			for(let i = 0; i < certificate.extensions.length; i++)
-			{
-				const row = extensionTable.insertRow(extensionTable.rows.length);
-				const cell0 = row.insertCell(0);
-				cell0.innerHTML = certificate.extensions[i].extnID;
-			}
-			
-			document.getElementById("cert-extn-div").style.display = "block";
-		}
-		//endregion
+		
 	}
 	//*********************************************************************************
 	function createCertificateInternal()
@@ -20094,28 +20035,29 @@
 			const certificateString = String.fromCharCode.apply(null, new Uint8Array(certificateBuffer));
 			
 			let resultString = "-----BEGIN CERTIFICATE-----\r\n";
-			resultString = `${resultString}${formatPEM(window.btoa(certificateString))}`;
+			resultString = `${resultString}${formatPEM(external.btoa(certificateString))}`;
 			resultString = `${resultString}\r\n-----END CERTIFICATE-----\r\n`;
 			
 			parseCertificate();
 			
-			alert("Certificate created successfully!");
+			console.log("Certificate created successfully!");
 			
 			const privateKeyString = String.fromCharCode.apply(null, new Uint8Array(privateKeyBuffer));
 			
 			resultString = `${resultString}\r\n-----BEGIN PRIVATE KEY-----\r\n`;
-			resultString = `${resultString}${formatPEM(window.btoa(privateKeyString))}`;
+			resultString = `${resultString}${formatPEM(external.btoa(privateKeyString))}`;
 			resultString = `${resultString}\r\n-----END PRIVATE KEY-----\r\n`;
 			
-			document.getElementById("new_signed_data").innerHTML = resultString;
+			//storeKeyValue(db,'crt',resultString);
+			console.log(resultString);
 			
-			alert("Private key exported successfully!");
+			console.log("Private key exported successfully!");
 		}, error =>
 		{
 			if(error instanceof Object)
-				alert(error.message);
+				console.log(error.message);
 			else
-				alert(error);
+				console.log(error);
 		});
 	}
 	//*********************************************************************************
@@ -20174,10 +20116,10 @@
 	{
 		return verifyCertificateInternal().then(result =>
 		{
-			alert(`Verification result: ${result.result}`);
+			return result;
 		}, error =>
 		{
-			alert(`Error during verification: ${error.resultMessage}`);
+			console.log('Error during verification:', error.resultMessage);
 		});
 	}
 	//*********************************************************************************
@@ -20212,14 +20154,14 @@
 					if(String.fromCharCode(view[i]) === "-")
 					{
 						// #region Decoded trustedCertificates
-						const asn1 = fromBER(stringToArrayBuffer(window.atob(certBodyEncoded)));
+						const asn1 = fromBER(stringToArrayBuffer(external.atob(certBodyEncoded)));
 						try
 						{
 							trustedCertificates.push(new Certificate({ schema: asn1.result }));
 						}
 						catch(ex)
 						{
-							alert("Wrong certificate format");
+							console.log("Wrong certificate format");
 							return;
 						}
 						// #endregion
@@ -20440,7 +20382,7 @@
 	//*********************************************************************************
 	function handleHashAlgOnChange()
 	{
-		const hashOption = document.getElementById("hash_alg").value;
+		const hashOption = "alg_SHA256";
 		switch(hashOption)
 		{
 			case "alg_SHA1":
@@ -20461,7 +20403,7 @@
 	//*********************************************************************************
 	function handleSignAlgOnChange()
 	{
-		const signOption = document.getElementById("sign_alg").value;
+		const signOption = "alg_RSA15";
 		switch(signOption)
 		{
 			case "alg_RSA15":
@@ -20498,21 +20440,60 @@
 	});
 	//*********************************************************************************
 
-	window.createPKCS10 = createPKCS10;
-	window.parsePKCS10 = parsePKCS10;
-	window.verifyPKCS10 = verifyPKCS10;
+    // Establish the root object, `window` in the browser, or `global` on the server.
+    var root = this; 
 
-	window.parseCertificate = parseCertificate;
-	window.createCertificate = createCertificate;
-	window.verifyCertificate = verifyCertificate;
-	window.parseCAbundle = parseCAbundle;
-	window.handleFileBrowse = handleFileBrowse;
-	window.handleTrustedCertsFile = handleTrustedCertsFile;
-	window.handleInterCertsFile = handleInterCertsFile;
-	window.handleCRLsFile = handleCRLsFile;
-	window.handleCABundle = handleCABundle;
-	window.handleHashAlgOnChange = handleHashAlgOnChange;
-	window.handleSignAlgOnChange = handleSignAlgOnChange;
+    // Create a reference to this
+    var _ = new Object();
+
+    var isNode = false;
+
+    // Export the Underscore object for **CommonJS**, with backwards-compatibility
+    // for the old `require()` API. If we're not in CommonJS, add `_` to the
+    // global object.
+    if (typeof module !== 'undefined' && module.exports) {
+            isNode = true;
+    } 
+
+    var external;
+	if (!isNode) {
+		window.createPKCS10 = createPKCS10;
+		window.parsePKCS10 = parsePKCS10;
+		window.verifyPKCS10 = verifyPKCS10;
+
+		window.parseCertificate = parseCertificate;
+		window.createCertificate = createCertificate;
+		window.verifyCertificate = verifyCertificate;
+		window.parseCAbundle = parseCAbundle;
+		window.handleFileBrowse = handleFileBrowse;
+		window.handleTrustedCertsFile = handleTrustedCertsFile;
+		window.handleInterCertsFile = handleInterCertsFile;
+		window.handleCRLsFile = handleCRLsFile;
+		window.handleCABundle = handleCABundle;
+		window.handleHashAlgOnChange = handleHashAlgOnChange;
+		window.handleSignAlgOnChange = handleSignAlgOnChange;
+		external = window;	
+	} else {
+		global.createPKCS10 = createPKCS10;
+		global.parsePKCS10 = parsePKCS10;
+		global.verifyPKCS10 = verifyPKCS10;
+
+		global.parseCertificate = parseCertificate;
+		global.createCertificate = createCertificate;
+		global.verifyCertificate = verifyCertificate;
+		global.parseCAbundle = parseCAbundle;
+		global.handleFileBrowse = handleFileBrowse;
+		global.handleTrustedCertsFile = handleTrustedCertsFile;
+		global.handleInterCertsFile = handleInterCertsFile;
+		global.handleCRLsFile = handleCRLsFile;
+		global.handleCABundle = handleCABundle;
+		global.handleHashAlgOnChange = handleHashAlgOnChange;
+		global.handleSignAlgOnChange = handleSignAlgOnChange;	
+		external = global;
+		external.btoa = require('btoa');
+		external.atob = require('atob');
+	}
+	
 
 	function context(name, func) {}
 
