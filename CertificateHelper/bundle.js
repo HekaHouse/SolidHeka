@@ -16118,6 +16118,630 @@
 	//**************************************************************************************
 
 	//**************************************************************************************
+	function CertificationRequestInfo(parameters = {})
+	{
+		//CertificationRequestInfo ::= SEQUENCE {
+		//    version       INTEGER { v1(0) } (v1,...),
+		//    subject       Name,
+		//    subjectPKInfo SubjectPublicKeyInfo{{ PKInfoAlgorithms }},
+		//    attributes    [0] Attributes{{ CRIAttributes }}
+		//}
+		
+		/**
+		 * @type {Object}
+		 * @property {string} [blockName]
+		 * @property {string} [CertificationRequestInfo]
+		 * @property {string} [CertificationRequestInfoVersion]
+		 * @property {string} [subject]
+		 * @property {string} [CertificationRequestInfoAttributes]
+		 * @property {string} [attributes]
+		 */
+		const names = getParametersValue(parameters, "names", {});
+		
+		return (new Sequence({
+			name: (names.CertificationRequestInfo || "CertificationRequestInfo"),
+			value: [
+				new Integer({ name: (names.CertificationRequestInfoVersion || "CertificationRequestInfo.version") }),
+				RelativeDistinguishedNames.schema(names.subject || {
+					names: {
+						blockName: "CertificationRequestInfo.subject"
+					}
+				}),
+				PublicKeyInfo.schema({
+					names: {
+						blockName: "CertificationRequestInfo.subjectPublicKeyInfo"
+					}
+				}),
+				new Constructed({
+					optional: true,
+					idBlock: {
+						tagClass: 3, // CONTEXT-SPECIFIC
+						tagNumber: 0 // [0]
+					},
+					value: [
+						new Repeated({
+							optional: true, // Because OpenSSL makes wrong "attributes" field
+							name: (names.CertificationRequestInfoAttributes || "CertificationRequestInfo.attributes"),
+							value: Attribute.schema(names.attributes || {})
+						})
+					]
+				})
+			]
+		}));
+	}
+	//**************************************************************************************
+	/**
+	 * Class from RFC2986
+	 */
+	class CertificationRequest {
+		//**********************************************************************************
+		/**
+		 * Constructor for Attribute class
+		 * @param {Object} [parameters={}]
+		 * @property {Object} [schema] asn1js parsed value
+		 */
+		constructor(parameters = {})
+		{
+			//region Internal properties of the object
+			/**
+			 * @type {ArrayBuffer}
+			 * @description tbs
+			 */
+			this.tbs = getParametersValue(parameters, "tbs", CertificationRequest.defaultValues("tbs"));
+			/**
+			 * @type {number}
+			 * @description version
+			 */
+			this.version = getParametersValue(parameters, "version", CertificationRequest.defaultValues("version"));
+			/**
+			 * @type {RelativeDistinguishedNames}
+			 * @description subject
+			 */
+			this.subject = getParametersValue(parameters, "subject", CertificationRequest.defaultValues("subject"));
+			/**
+			 * @type {PublicKeyInfo}
+			 * @description subjectPublicKeyInfo
+			 */
+			this.subjectPublicKeyInfo = getParametersValue(parameters, "subjectPublicKeyInfo", CertificationRequest.defaultValues("subjectPublicKeyInfo"));
+			
+			if("attributes" in parameters)
+				/**
+				 * @type {Array.<Attribute>}
+				 * @description attributes
+				 */
+				this.attributes = getParametersValue(parameters, "attributes", CertificationRequest.defaultValues("attributes"));
+			
+			/**
+			 * @type {AlgorithmIdentifier}
+			 * @description signatureAlgorithm
+			 */
+			this.signatureAlgorithm = getParametersValue(parameters, "signatureAlgorithm", CertificationRequest.defaultValues("signatureAlgorithm"));
+			/**
+			 * @type {BitString}
+			 * @description signatureAlgorithm
+			 */
+			this.signatureValue = getParametersValue(parameters, "signatureValue", CertificationRequest.defaultValues("signatureValue"));
+			//endregion
+			
+			//region If input argument array contains "schema" for this object
+			if("schema" in parameters)
+				this.fromSchema(parameters.schema);
+			//endregion
+		}
+		//**********************************************************************************
+		/**
+		 * Return default values for all class members
+		 * @param {string} memberName String name for a class member
+		 */
+		static defaultValues(memberName)
+		{
+			switch(memberName)
+			{
+				case "tbs":
+					return new ArrayBuffer(0);
+				case "version":
+					return 0;
+				case "subject":
+					return new RelativeDistinguishedNames();
+				case "subjectPublicKeyInfo":
+					return new PublicKeyInfo();
+				case "attributes":
+					return [];
+				case "signatureAlgorithm":
+					return new AlgorithmIdentifier();
+				case "signatureValue":
+					return new BitString();
+				default:
+					throw new Error(`Invalid member name for CertificationRequest class: ${memberName}`);
+			}
+		}
+		//**********************************************************************************
+		/**
+		 * Return value of asn1js schema for current class
+		 * @param {Object} parameters Input parameters for the schema
+		 * @returns {Object} asn1js schema object
+		 */
+		static schema(parameters = {})
+		{
+			//CertificationRequest ::= SEQUENCE {
+			//    certificationRequestInfo CertificationRequestInfo,
+			//    signatureAlgorithm       AlgorithmIdentifier{{ SignatureAlgorithms }},
+			//    signature                BIT STRING
+			//}
+			
+			/**
+			 * @type {Object}
+			 * @property {string} [blockName]
+			 * @property {string} [certificationRequestInfo]
+			 * @property {string} [signatureAlgorithm]
+			 * @property {string} [signatureValue]
+			 */
+			const names = getParametersValue(parameters, "names", {});
+			
+			return (new Sequence({
+				value: [
+					CertificationRequestInfo(names.certificationRequestInfo || {}),
+					new Sequence({
+						name: (names.signatureAlgorithm || "signatureAlgorithm"),
+						value: [
+							new ObjectIdentifier(),
+							new Any({ optional: true })
+						]
+					}),
+					new BitString({ name: (names.signatureValue || "signatureValue") })
+				]
+			}));
+		}
+		//**********************************************************************************
+		/**
+		 * Convert parsed asn1js object into current class
+		 * @param {!Object} schema
+		 */
+		fromSchema(schema)
+		{
+			//region Check the schema is valid
+			const asn1 = compareSchema(schema,
+				schema,
+				CertificationRequest.schema()
+			);
+			
+			if(asn1.verified === false)
+				throw new Error("Object's schema was not verified against input data for PKCS10");
+			//endregion
+			
+			//region Get internal properties from parsed schema
+			this.tbs = asn1.result.CertificationRequestInfo.valueBeforeDecode;
+			
+			this.version = asn1.result["CertificationRequestInfo.version"].valueBlock.valueDec;
+			this.subject = new RelativeDistinguishedNames({ schema: asn1.result["CertificationRequestInfo.subject"] });
+			this.subjectPublicKeyInfo = new PublicKeyInfo({ schema: asn1.result["CertificationRequestInfo.subjectPublicKeyInfo"] });
+			if("CertificationRequestInfo.attributes" in asn1.result)
+				this.attributes = Array.from(asn1.result["CertificationRequestInfo.attributes"], element => new Attribute({ schema: element }));
+			
+			this.signatureAlgorithm = new AlgorithmIdentifier({ schema: asn1.result.signatureAlgorithm });
+			this.signatureValue = asn1.result.signatureValue;
+			//endregion
+		}
+		//**********************************************************************************
+		/**
+		 * Aux function making ASN1js Sequence from current TBS
+		 * @returns {Sequence}
+		 */
+		encodeTBS()
+		{
+			//region Create array for output sequence
+			const outputArray = [
+				new Integer({ value: this.version }),
+				this.subject.toSchema(),
+				this.subjectPublicKeyInfo.toSchema()
+			];
+			
+			if("attributes" in this)
+			{
+				outputArray.push(new Constructed({
+					idBlock: {
+						tagClass: 3, // CONTEXT-SPECIFIC
+						tagNumber: 0 // [0]
+					},
+					value: Array.from(this.attributes, element => element.toSchema())
+				}));
+			}
+			//endregion
+			
+			return (new Sequence({
+				value: outputArray
+			}));
+		}
+		//**********************************************************************************
+		/**
+		 * Convert current object to asn1js object and set correct values
+		 * @returns {Object} asn1js object
+		 */
+		toSchema(encodeFlag = false)
+		{
+			//region Decode stored TBS value
+			let tbsSchema;
+			
+			if(encodeFlag === false)
+			{
+				if(this.tbs.length === 0) // No stored TBS part
+					return CertificationRequest.schema();
+				
+				tbsSchema = fromBER(this.tbs).result;
+			}
+			//endregion
+			//region Create TBS schema via assembling from TBS parts
+			else
+				tbsSchema = this.encodeTBS();
+			//endregion
+			
+			//region Construct and return new ASN.1 schema for this object
+			return (new Sequence({
+				value: [
+					tbsSchema,
+					this.signatureAlgorithm.toSchema(),
+					this.signatureValue
+				]
+			}));
+			//endregion
+		}
+		//**********************************************************************************
+		/**
+		 * Convertion for the class to JSON object
+		 * @returns {Object}
+		 */
+		toJSON()
+		{
+			const object = {
+				tbs: bufferToHexCodes(this.tbs, 0, this.tbs.byteLength),
+				version: this.version,
+				subject: this.subject.toJSON(),
+				subjectPublicKeyInfo: this.subjectPublicKeyInfo.toJSON(),
+				signatureAlgorithm: this.signatureAlgorithm.toJSON(),
+				signatureValue: this.signatureValue.toJSON()
+			};
+			
+			if("attributes" in this)
+				object.attributes = Array.from(this.attributes, element => element.toJSON());
+			
+			return object;
+		}
+		//**********************************************************************************
+		/**
+		 * Makes signature for currect certification request
+		 * @param {Object} privateKey WebCrypto private key
+		 * @param {string} [hashAlgorithm=SHA-1] String representing current hashing algorithm
+		 */
+		sign(privateKey, hashAlgorithm = "SHA-1")
+		{
+			//region Get a private key from function parameter
+			if(typeof privateKey === "undefined")
+				return Promise.reject("Need to provide a private key for signing");
+			//endregion
+			
+			//region Get hashing algorithm
+			const oid = getOIDByAlgorithm({ name: hashAlgorithm });
+			if(oid === "")
+				return Promise.reject("Unsupported hash algorithm: {$hashAlgorithm}");
+			//endregion
+			
+			//region Get a "default parameters" for current algorithm
+			const defParams = getAlgorithmParameters(privateKey.algorithm.name, "sign");
+			defParams.algorithm.hash.name = hashAlgorithm;
+			//endregion
+			
+			//region Fill internal structures base on "privateKey" and "hashAlgorithm"
+			switch(privateKey.algorithm.name.toUpperCase())
+			{
+				case "RSASSA-PKCS1-V1_5":
+				case "ECDSA":
+					this.signatureAlgorithm.algorithmId = getOIDByAlgorithm(defParams.algorithm);
+					break;
+				case "RSA-PSS":
+					{
+					//region Set "saltLength" as a length (in octets) of hash function result
+						switch(hashAlgorithm.toUpperCase())
+					{
+							case "SHA-256":
+								defParams.algorithm.saltLength = 32;
+								break;
+							case "SHA-384":
+								defParams.algorithm.saltLength = 48;
+								break;
+							case "SHA-512":
+								defParams.algorithm.saltLength = 64;
+								break;
+							default:
+						}
+					//endregion
+					
+					//region Fill "RSASSA_PSS_params" object
+						const paramsObject = {};
+					
+						if(hashAlgorithm.toUpperCase() !== "SHA-1")
+					{
+							const hashAlgorithmOID = getOIDByAlgorithm({ name: hashAlgorithm });
+							if(hashAlgorithmOID === "")
+								return Promise.reject(`Unsupported hash algorithm: ${hashAlgorithm}`);
+						
+							paramsObject.hashAlgorithm = new AlgorithmIdentifier({
+								algorithmId: hashAlgorithmOID,
+								algorithmParams: new Null()
+							});
+						
+							paramsObject.maskGenAlgorithm = new AlgorithmIdentifier({
+								algorithmId: "1.2.840.113549.1.1.8", // MGF1
+								algorithmParams: paramsObject.hashAlgorithm.toSchema()
+							});
+						}
+					
+						if(defParams.algorithm.saltLength !== 20)
+							paramsObject.saltLength = defParams.algorithm.saltLength;
+					
+						const pssParameters = new RSASSAPSSParams(paramsObject);
+					//endregion
+					
+					//region Automatically set signature algorithm
+						this.signatureAlgorithm = new AlgorithmIdentifier({
+							algorithmId: "1.2.840.113549.1.1.10",
+							algorithmParams: pssParameters.toSchema()
+						});
+					//endregion
+					}
+					break;
+				default:
+					return Promise.reject(`Unsupported signature algorithm: ${privateKey.algorithm.name}`);
+			}
+			//endregion
+			
+			//region Create TBS data for signing
+			this.tbs = this.encodeTBS().toBER(false);
+			//endregion
+			
+			//region Get a "crypto" extension
+			const crypto = getCrypto();
+			if(typeof crypto === "undefined")
+				return Promise.reject("Unable to create WebCrypto object");
+			//endregion
+			
+			//region Signing TBS data on provided private key
+			return crypto.sign(defParams.algorithm,
+				privateKey,
+				new Uint8Array(this.tbs)
+			).then(result =>
+				{
+					//region Special case for ECDSA algorithm
+				if(defParams.algorithm.name === "ECDSA")
+					result = createCMSECDSASignature(result);
+					//endregion
+					
+				this.signatureValue = new BitString({ valueHex: result });
+			}, error => Promise.reject(`Signing error: ${error}`)
+			);
+			//endregion
+		}
+		//**********************************************************************************
+		/**
+		 * Verify existing certification request signature
+		 * @returns {*}
+		 */
+		verify()
+		{
+			//region Global variables
+			let sequence = Promise.resolve();
+			
+			const subjectPublicKeyInfo = this.subjectPublicKeyInfo;
+			const signature = this.signatureValue;
+			const tbs = this.tbs;
+			//endregion
+			
+			//region Get a "crypto" extension
+			const crypto = getCrypto();
+			if(typeof crypto === "undefined")
+				return Promise.reject("Unable to create WebCrypto object");
+			//endregion
+			
+			//region Find a correct hashing algorithm
+			const shaAlgorithm = getHashAlgorithm(this.signatureAlgorithm);
+			if(shaAlgorithm === "")
+				return Promise.reject(`Unsupported signature algorithm: ${this.signatureAlgorithm.algorithmId}`);
+			//endregion
+			
+			//region Importing public key
+			sequence = sequence.then(() =>
+			{
+				//region Get information about public key algorithm and default parameters for import
+				let algorithmId;
+				if(this.signatureAlgorithm.algorithmId === "1.2.840.113549.1.1.10")
+					algorithmId = this.signatureAlgorithm.algorithmId;
+				else
+					algorithmId = this.subjectPublicKeyInfo.algorithm.algorithmId;
+				
+				const algorithmObject = getAlgorithmByOID(algorithmId);
+				if(("name" in algorithmObject) === false)
+					return Promise.reject(`Unsupported public key algorithm: ${algorithmId}`);
+				
+				const algorithmName = algorithmObject.name;
+				
+				const algorithm = getAlgorithmParameters(algorithmName, "importkey");
+				if("hash" in algorithm.algorithm)
+					algorithm.algorithm.hash.name = shaAlgorithm;
+				
+				//region Special case for ECDSA
+				if(algorithmObject.name === "ECDSA")
+				{
+					// #region Get information about named curve
+					let algorithmParamsChecked = false;
+					
+					if(("algorithmParams" in subjectPublicKeyInfo.algorithm) === true)
+					{
+						if("idBlock" in subjectPublicKeyInfo.algorithm.algorithmParams)
+						{
+							if((subjectPublicKeyInfo.algorithm.algorithmParams.idBlock.tagClass === 1) && (subjectPublicKeyInfo.algorithm.algorithmParams.idBlock.tagNumber === 6))
+								algorithmParamsChecked = true;
+						}
+					}
+					
+					if(algorithmParamsChecked === false)
+						return Promise.reject("Incorrect type for ECDSA public key parameters");
+					
+					const curveObject = getAlgorithmByOID(subjectPublicKeyInfo.algorithm.algorithmParams.valueBlock.toString());
+					if(("name" in curveObject) === false)
+						return Promise.reject(`Unsupported named curve algorithm: ${subjectPublicKeyInfo.algorithm.algorithmParams.valueBlock.toString()}`);
+					// #endregion
+					
+					algorithm.algorithm.namedCurve = curveObject.name;
+				}
+				//endregion
+				//endregion
+				
+				const publicKeyInfoSchema = subjectPublicKeyInfo.toSchema();
+				const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
+				const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
+				
+				return crypto.importKey("spki", publicKeyInfoView, algorithm.algorithm, true, algorithm.usages);
+			});
+			//endregion
+			
+			//region Verify signature
+			sequence = sequence.then(publicKey =>
+			{
+				//region Get default algorithm parameters for verification
+				const algorithm = getAlgorithmParameters(publicKey.algorithm.name, "verify");
+				if("hash" in algorithm.algorithm)
+					algorithm.algorithm.hash.name = shaAlgorithm;
+				//endregion
+				
+				//region Special case for ECDSA signatures
+				let signatureValue = signature.valueBlock.valueHex;
+				
+				if(publicKey.algorithm.name === "ECDSA")
+				{
+					const asn1 = fromBER(signatureValue);
+					signatureValue = createECDSASignatureFromCMS(asn1.result);
+				}
+				//endregion
+				
+				//region Special case for RSA-PSS
+				if(publicKey.algorithm.name === "RSA-PSS")
+				{
+					let pssParameters;
+					
+					try
+					{
+						pssParameters = new RSASSAPSSParams({ schema: this.signatureAlgorithm.algorithmParams });
+					}
+					catch(ex)
+					{
+						return Promise.reject(ex);
+					}
+					
+					if("saltLength" in pssParameters)
+						algorithm.algorithm.saltLength = pssParameters.saltLength;
+					else
+						algorithm.algorithm.saltLength = 20;
+					
+					let hashAlgo = "SHA-1";
+					
+					if("hashAlgorithm" in pssParameters)
+					{
+						const hashAlgorithm = getAlgorithmByOID(pssParameters.hashAlgorithm.algorithmId);
+						if(("name" in hashAlgorithm) === false)
+							return Promise.reject(`Unrecognized hash algorithm: ${pssParameters.hashAlgorithm.algorithmId}`);
+						
+						hashAlgo = hashAlgorithm.name;
+					}
+					
+					algorithm.algorithm.hash.name = hashAlgo;
+				}
+				//endregion
+				
+				return crypto.verify(algorithm.algorithm,
+					publicKey,
+					new Uint8Array(signatureValue),
+					new Uint8Array(tbs));
+			});
+			//endregion
+			
+			return sequence;
+		}
+		//**********************************************************************************
+		/**
+		 * Importing public key for current certificate request
+		 */
+		getPublicKey(parameters = null)
+		{
+			//region Get a "crypto" extension
+			const crypto = getCrypto();
+			if(typeof crypto === "undefined")
+				return Promise.reject("Unable to create WebCrypto object");
+			//endregion
+			
+			//region Find correct algorithm for imported public key
+			if(parameters === null)
+			{
+				//region Initial variables
+				parameters = {};
+				//endregion
+				
+				//region Find signer's hashing algorithm
+				const shaAlgorithm = getHashAlgorithm(this.signatureAlgorithm);
+				if(shaAlgorithm === "")
+					return Promise.reject(`Unsupported signature algorithm: ${this.signatureAlgorithm.algorithmId}`);
+				//endregion
+				
+				//region Get information about public key algorithm and default parameters for import
+				const algorithmObject = getAlgorithmByOID(this.subjectPublicKeyInfo.algorithm.algorithmId);
+				if(("name" in algorithmObject) === false)
+					return Promise.reject(`Unsupported public key algorithm: ${this.subjectPublicKeyInfo.algorithm.algorithmId}`);
+				
+				parameters.algorithm = getAlgorithmParameters(algorithmObject.name, "importkey");
+				if("hash" in parameters.algorithm.algorithm)
+					parameters.algorithm.algorithm.hash.name = shaAlgorithm;
+				
+				//region Special case for ECDSA
+				if(algorithmObject.name === "ECDSA")
+				{
+					//region Get information about named curve
+					let algorithmParamsChecked = false;
+					
+					if(("algorithmParams" in this.subjectPublicKeyInfo.algorithm) === true)
+					{
+						if("idBlock" in this.subjectPublicKeyInfo.algorithm.algorithmParams)
+						{
+							if((this.subjectPublicKeyInfo.algorithm.algorithmParams.idBlock.tagClass === 1) && (this.subjectPublicKeyInfo.algorithm.algorithmParams.idBlock.tagNumber === 6))
+								algorithmParamsChecked = true;
+						}
+					}
+					
+					if(algorithmParamsChecked === false)
+						return Promise.reject("Incorrect type for ECDSA public key parameters");
+					
+					const curveObject = getAlgorithmByOID(this.subjectPublicKeyInfo.algorithm.algorithmParams.valueBlock.toString());
+					if(("name" in curveObject) === false)
+						return Promise.reject(`Unsupported named curve algorithm: ${this.subjectPublicKeyInfo.algorithm.algorithmParams.valueBlock.toString()}`);
+					//endregion
+					
+					parameters.algorithm.algorithm.namedCurve = curveObject.name;
+				}
+				//endregion
+				//endregion
+			}
+			//endregion
+			
+			//region Get neccessary values from internal fields for current certificate
+			const publicKeyInfoSchema = this.subjectPublicKeyInfo.toSchema();
+			const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
+			const publicKeyInfoView = new Uint8Array(publicKeyInfoBuffer);
+			//endregion
+			
+			return crypto.importKey("spki", publicKeyInfoView, parameters.algorithm.algorithm, true, parameters.algorithm.usages);
+		}
+		//**********************************************************************************
+	}
+	//**************************************************************************************
+
+	//**************************************************************************************
 	/**
 	 * Class from RFC5280
 	 */
@@ -18866,6 +19490,8 @@
 	//**************************************************************************************
 
 	//*********************************************************************************
+	let pkcs10Buffer = new ArrayBuffer(0);
+
 	let certificateBuffer = new ArrayBuffer(0); // ArrayBuffer with loaded or created CERT
 	let privateKeyBuffer = new ArrayBuffer(0);
 	let trustedCertificates = []; // Array of root certificates from "CA Bundle"
@@ -18873,7 +19499,7 @@
 	const crls = []; // Array of CRLs for all certificates (trusted + intermediate)
 
 	let hashAlg = "SHA-1";
-	let signAlg = "RSASSA-PKCS1-v1_5";
+	let signAlg = "RSASSA-PKCS1-V1_5";
 	//*********************************************************************************
 	function formatPEM(pemString)
 	{
@@ -18896,6 +19522,283 @@
 		
 		return resultString;
 	}
+	//*********************************************************************************
+	//region Create PKCS#10
+	//*********************************************************************************
+	function createPKCS10Internal()
+	{
+		//region Initial variables
+		let sequence = Promise.resolve();
+		
+		const pkcs10 = new CertificationRequest();
+		
+		let publicKey;
+		let privateKey;
+		//endregion
+		
+		//region Get a "crypto" extension
+		const crypto = getCrypto();
+		if(typeof crypto === "undefined")
+			return Promise.reject("No WebCrypto extension found");
+		//endregion
+		
+		//region Put a static values
+		pkcs10.version = 0;
+		pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+			type: "2.5.4.6",
+			value: new PrintableString({ value: "RU" })
+		}));
+		pkcs10.subject.typesAndValues.push(new AttributeTypeAndValue({
+			type: "2.5.4.3",
+			value: new Utf8String({ value: "Simple test (простой тест)" })
+		}));
+		
+		pkcs10.attributes = [];
+		//endregion
+		
+		//region Create a new key pair
+		sequence = sequence.then(() =>
+			{
+				//region Get default algorithm parameters for key generation
+				const algorithm = getAlgorithmParameters(signAlg, "generatekey");
+				if("hash" in algorithm.algorithm)
+					algorithm.algorithm.hash.name = hashAlg;
+				//endregion
+				
+				return crypto.generateKey(algorithm.algorithm, true, algorithm.usages);
+			}
+		);
+		//endregion
+		
+		//region Store new key in an interim variables
+		sequence = sequence.then(keyPair =>
+			{
+				publicKey = keyPair.publicKey;
+				privateKey = keyPair.privateKey;
+			},
+			error => Promise.reject((`Error during key generation: ${error}`))
+		);
+		//endregion
+		
+		//region Exporting public key into "subjectPublicKeyInfo" value of PKCS#10
+		sequence = sequence.then(() => pkcs10.subjectPublicKeyInfo.importKey(publicKey));
+		//endregion
+		
+		//region SubjectKeyIdentifier
+		sequence = sequence.then(() => crypto.digest({ name: "SHA-1" }, pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex))
+			.then(result =>
+				{
+					pkcs10.attributes.push(new Attribute({
+						type: "1.2.840.113549.1.9.14", // pkcs-9-at-extensionRequest
+						values: [(new Extensions({
+							extensions: [
+								new Extension({
+									extnID: "2.5.29.14",
+									critical: false,
+									extnValue: (new OctetString({ valueHex: result })).toBER(false)
+								})
+							]
+						})).toSchema()]
+					}));
+				}
+			);
+		//endregion
+		
+		//region Signing final PKCS#10 request
+		sequence = sequence.then(() => pkcs10.sign(privateKey, hashAlg), error => Promise.reject(`Error during exporting public key: ${error}`));
+		//endregion
+		
+		return sequence.then(() =>
+		{
+			pkcs10Buffer = pkcs10.toSchema().toBER(false);
+			
+		}, error => Promise.reject(`Error signing PKCS#10: ${error}`));
+	}
+	//*********************************************************************************
+	function createPKCS10()
+	{
+		return Promise.resolve().then(() => createPKCS10Internal()).then(() =>
+		{
+			let resultString = "-----BEGIN CERTIFICATE REQUEST-----\r\n";
+			resultString = `${resultString}${formatPEM(toBase64(arrayBufferToString(pkcs10Buffer)))}`;
+			resultString = `${resultString}\r\n-----END CERTIFICATE REQUEST-----\r\n`;
+			
+			document.getElementById("pem-text-block").value = resultString;
+			
+			parsePKCS10();
+		});
+	}
+	//*********************************************************************************
+	//endregion
+	//*********************************************************************************
+	//region Parse existing PKCS#10
+	//*********************************************************************************
+	function parsePKCS10()
+	{
+		//region Initial activities
+		document.getElementById("pkcs10-subject").innerHTML = "";
+		document.getElementById("pkcs10-exten").innerHTML = "";
+		
+		document.getElementById("pkcs10-data-block").style.display = "none";
+		document.getElementById("pkcs10-attributes").style.display = "none";
+		//endregion
+		
+		//region Decode existing PKCS#10
+		const stringPEM = document.getElementById("pem-text-block").value.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "");
+		
+		const asn1 = fromBER(stringToArrayBuffer(fromBase64((stringPEM))));
+		const pkcs10 = new CertificationRequest({ schema: asn1.result });
+		//endregion
+		
+		//region Parse and display information about "subject"
+		const typemap = {
+			"2.5.4.6": "C",
+			"2.5.4.11": "OU",
+			"2.5.4.10": "O",
+			"2.5.4.3": "CN",
+			"2.5.4.7": "L",
+			"2.5.4.8": "S",
+			"2.5.4.12": "T",
+			"2.5.4.42": "GN",
+			"2.5.4.43": "I",
+			"2.5.4.4": "SN",
+			"1.2.840.113549.1.9.1": "E-mail"
+		};
+		
+		for(let i = 0; i < pkcs10.subject.typesAndValues.length; i++)
+		{
+			let typeval = typemap[pkcs10.subject.typesAndValues[i].type];
+			if(typeof typeval === "undefined")
+				typeval = pkcs10.subject.typesAndValues[i].type;
+			
+			const subjval = pkcs10.subject.typesAndValues[i].value.valueBlock.value;
+			const ulrow = `<li><p><span>${typeval}</span> ${subjval}</p></li>`;
+			
+			document.getElementById("pkcs10-subject").innerHTML = document.getElementById("pkcs10-subject").innerHTML + ulrow;
+			if(typeval === "CN")
+				document.getElementById("pkcs10-subject-cn").innerHTML = subjval;
+		}
+		//endregion
+		
+		//region Put information about public key size
+		let publicKeySize = "< unknown >";
+		
+		if(pkcs10.subjectPublicKeyInfo.algorithm.algorithmId.indexOf("1.2.840.113549") !== (-1))
+		{
+			const asn1PublicKey = fromBER(pkcs10.subjectPublicKeyInfo.subjectPublicKey.valueBlock.valueHex);
+			const rsaPublicKeySimple = new RSAPublicKey({ schema: asn1PublicKey.result });
+			const modulusView = new Uint8Array(rsaPublicKeySimple.modulus.valueBlock.valueHex);
+			let modulusBitLength = 0;
+			
+			if(modulusView[0] === 0x00)
+				modulusBitLength = (rsaPublicKeySimple.modulus.valueBlock.valueHex.byteLength - 1) * 8;
+			else
+				modulusBitLength = rsaPublicKeySimple.modulus.valueBlock.valueHex.byteLength * 8;
+			
+			publicKeySize = modulusBitLength.toString();
+		}
+		
+		document.getElementById("keysize").innerHTML = publicKeySize;
+		//endregion
+		
+		//region Put information about signature algorithm
+		const algomap = {
+			"1.2.840.113549.1.1.2": "MD2 with RSA",
+			"1.2.840.113549.1.1.4": "MD5 with RSA",
+			"1.2.840.10040.4.3": "SHA1 with DSA",
+			"1.2.840.10045.4.1": "SHA1 with ECDSA",
+			"1.2.840.10045.4.3.2": "SHA256 with ECDSA",
+			"1.2.840.10045.4.3.3": "SHA384 with ECDSA",
+			"1.2.840.10045.4.3.4": "SHA512 with ECDSA",
+			"1.2.840.113549.1.1.10": "RSA-PSS",
+			"1.2.840.113549.1.1.5": "SHA1 with RSA",
+			"1.2.840.113549.1.1.14": "SHA224 with RSA",
+			"1.2.840.113549.1.1.11": "SHA256 with RSA",
+			"1.2.840.113549.1.1.12": "SHA384 with RSA",
+			"1.2.840.113549.1.1.13": "SHA512 with RSA"
+		};
+		let signatureAlgorithm = algomap[pkcs10.signatureAlgorithm.algorithmId];
+		if(typeof signatureAlgorithm === "undefined")
+			signatureAlgorithm = pkcs10.signatureAlgorithm.algorithmId;
+		else
+			signatureAlgorithm = `${signatureAlgorithm} (${pkcs10.signatureAlgorithm.algorithmId})`;
+		
+		document.getElementById("sig-algo").innerHTML = signatureAlgorithm;
+		//endregion
+		
+		//region Put information about PKCS#10 attributes
+		if("attributes" in pkcs10)
+		{
+			for(let i = 0; i < pkcs10.attributes.length; i++)
+			{
+				const typeval = pkcs10.attributes[i].type;
+				let subjval = "";
+				
+				for(let j = 0; j < pkcs10.attributes[i].values.length; j++)
+				{
+					if((pkcs10.attributes[i].values[j] instanceof Utf8String) ||
+						(pkcs10.attributes[i].values[j] instanceof BmpString) ||
+						(pkcs10.attributes[i].values[j] instanceof UniversalString) ||
+						(pkcs10.attributes[i].values[j] instanceof NumericString) ||
+						(pkcs10.attributes[i].values[j] instanceof PrintableString) ||
+						(pkcs10.attributes[i].values[j] instanceof TeletexString) ||
+						(pkcs10.attributes[i].values[j] instanceof VideotexString) ||
+						(pkcs10.attributes[i].values[j] instanceof IA5String) ||
+						(pkcs10.attributes[i].values[j] instanceof GraphicString) ||
+						(pkcs10.attributes[i].values[j] instanceof VisibleString) ||
+						(pkcs10.attributes[i].values[j] instanceof GeneralString) ||
+						(pkcs10.attributes[i].values[j] instanceof CharacterString))
+					{
+						subjval = subjval + ((subjval.length === 0) ? "" : ";") + pkcs10.attributes[i].values[j].valueBlock.value;
+					}
+					else
+						subjval = subjval + ((subjval.length === 0) ? "" : ";") + pkcs10.attributes[i].values[j].constructor.blockName();
+				}
+				
+				const ulrow = `<li><p><span>${typeval}</span> ${subjval}</p></li>`;
+				document.getElementById("pkcs10-exten").innerHTML = document.getElementById("pkcs10-exten").innerHTML + ulrow;
+			}
+			
+			document.getElementById("pkcs10-attributes").style.display = "block";
+		}
+		//endregion
+		
+		document.getElementById("pkcs10-data-block").style.display = "block";
+	}
+	//*********************************************************************************
+	//endregion
+	//*********************************************************************************
+	//region Verify existing PKCS#10
+	//*********************************************************************************
+	function verifyPKCS10Internal()
+	{
+		//region Decode existing PKCS#10
+		const asn1 = fromBER(pkcs10Buffer);
+		const pkcs10 = new CertificationRequest({ schema: asn1.result });
+		//endregion
+		
+		//region Verify PKCS#10
+		return pkcs10.verify();
+		//endregion
+	}
+	//*********************************************************************************
+	function verifyPKCS10()
+	{
+		return Promise.resolve().then(() =>
+		{
+			pkcs10Buffer = stringToArrayBuffer(fromBase64(document.getElementById("pem-text-block").value.replace(/(-----(BEGIN|END) CERTIFICATE REQUEST-----|\n)/g, "")));
+		}).then(() => verifyPKCS10Internal()).then(result =>
+		{
+			alert(`Verification passed: ${result}`);
+		}, error =>
+		{
+			alert(`Error during verification: ${error}`);
+		});
+	}
+	//*********************************************************************************
+	//endregion
+	//*********************************************************************************
+
 	//*********************************************************************************
 	function parseCertificate()
 	{
@@ -19577,7 +20480,9 @@
 	context("Hack for Rollup.js", () =>
 	{
 		return;
-		
+		createPKCS10();
+		parsePKCS10();
+		verifyPKCS10();
 		parseCertificate();
 		createCertificate();
 		verifyCertificate();
@@ -19592,58 +20497,10 @@
 		setEngine();
 	});
 	//*********************************************************************************
-	context("Certificate Complex Example", () =>
-	{
-		//region Initial variables
-		const hashAlgs = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
-		const signAlgs = ["RSASSA-PKCS1-V1_5", "ECDSA", "RSA-PSS"];
-		
-		const algorithmsMap = new Map([
-			["SHA-1 + RSASSA-PKCS1-V1_5", "1.2.840.113549.1.1.5"],
-			["SHA-256 + RSASSA-PKCS1-V1_5", "1.2.840.113549.1.1.11"],
-			["SHA-384 + RSASSA-PKCS1-V1_5", "1.2.840.113549.1.1.12"],
-			["SHA-512 + RSASSA-PKCS1-V1_5", "1.2.840.113549.1.1.13"],
-			
-			["SHA-1 + ECDSA", "1.2.840.10045.4.1"],
-			["SHA-256 + ECDSA", "1.2.840.10045.4.3.2"],
-			["SHA-384 + ECDSA", "1.2.840.10045.4.3.3"],
-			["SHA-512 + ECDSA", "1.2.840.10045.4.3.4"],
-			
-			["SHA-1 + RSA-PSS", "1.2.840.113549.1.1.10"],
-			["SHA-256 + RSA-PSS", "1.2.840.113549.1.1.10"],
-			["SHA-384 + RSA-PSS", "1.2.840.113549.1.1.10"],
-			["SHA-512 + RSA-PSS", "1.2.840.113549.1.1.10"]
-		]);
-		//endregion
-		
-		signAlgs.forEach(_signAlg =>
-		{
-			hashAlgs.forEach(_hashAlg =>
-			{
-				const testName = `${_hashAlg} + ${_signAlg}`;
-				
-				it(testName, () =>
-				{
-					hashAlg = _hashAlg;
-					signAlg = _signAlg;
-					
-					return createCertificateInternal().then(() =>
-					{
-						const asn1 = fromBER(certificateBuffer);
-						const certificate = new Certificate({ schema: asn1.result });
-						
-						assert.equal(certificate.signatureAlgorithm.algorithmId, algorithmsMap.get(testName), `Signature algorithm must be ${testName}`);
-						
-						return verifyCertificateInternal().then(result =>
-						{
-							assert.equal(result.result, true, "Certificate must be verified sucessfully");
-						});
-					});
-				});
-			});
-		});
-	});
-	//*********************************************************************************
+
+	window.createPKCS10 = createPKCS10;
+	window.parsePKCS10 = parsePKCS10;
+	window.verifyPKCS10 = verifyPKCS10;
 
 	window.parseCertificate = parseCertificate;
 	window.createCertificate = createCertificate;
