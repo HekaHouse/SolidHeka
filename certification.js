@@ -1,7 +1,17 @@
 var forge = require('node-forge');
 var pki = forge.pki;
 
-
+String.prototype.getBytes = function() {
+    var bytes = [];
+    for (var i = 0; i < this.length; i++) {
+        var charCode = this.charCodeAt(i);
+        var cLen = Math.ceil(Math.log(charCode)/Math.log(256));
+        for (var j = 0; j < cLen; j++) {
+            bytes.push((charCode << (j*8)) & 0xFF);
+        }
+    }
+    return bytes;
+}
 
 exports.generate = function(username,csrpem) {
   var csr = forge.pki.certificationRequestFromPem(csrpem);
@@ -88,10 +98,10 @@ exports.generate = function(username,csrpem) {
 
   var certObj = {'keys':{'public':pub,'private':enc_priv},'request':csrpem,'cert':certifiedpem};
 
-  var bin = new Buffer(JSON.stringify(certObj), 'utf8');
-  var signature = keys.privateKey.sign(bin);
+  
+  var signature = keys.privateKey.sign(JSON.stringify(certObj).getBytes());
 
-  var verified = keys.publicKey.verify(bin, signature);
+  var verified = keys.publicKey.verify(JSON.stringify(certObj).getBytes(), signature);
   console.log(verified);
 
 
