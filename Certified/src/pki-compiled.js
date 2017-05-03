@@ -15934,7 +15934,7 @@
 
 		delete secure.signed;
 
-		var signed = str2ab(JSON.stringify(secure));
+		var signed = await sha256(JSON.stringify(secure));
 
 
 		//region Decode existing Certificate
@@ -16276,6 +16276,24 @@
 		});
 	});
 	//*********************************************************************************
+
+/**
+ * Returns SHA-256 hash from supplied message.
+ *
+ * @param   {String} message.
+ * @returns {String} hash as hex string.
+ *
+ * @example
+ *   sha256('abc').then(hash => console.log(hash));
+ *   const hash = await sha256('abc');
+ */
+async function sha256(message) {
+    const msgUint8 = new TextEncoder('utf-8').encode(message);                      // encode as UTF-8
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);             // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert hash to byte array    
+    return hashArray;
+}
+
 
 	window.generateRSASSA_PKCS1_V1_5 = generateRSASSA_PKCS1_V1_5;
 	window.createPKCS10 = createPKCS10;
