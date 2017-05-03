@@ -15966,7 +15966,7 @@
 				    },
 				    publicKey, 
 				    binSig, 
-				    Array.from(new Uint8Array(hash)); 
+				    Array.from(new Uint8Array(hash))
 				)
 				.then(function(isvalid){
 				    //returns a boolean on whether the signature is true or not
