@@ -15967,7 +15967,7 @@
 				        name: "RSASSA-PKCS1-v1_5",
 				    },
 				    publicKey, 
-				    new Uint8Array(signature.valueBlock.valueHex), 
+				    new Uint8Array(cert_signature.valueBlock.valueHex), 
 				    new Uint8Array(tbs)
 				)
 				.then(function(isvalid){
