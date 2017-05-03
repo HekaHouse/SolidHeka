@@ -15942,6 +15942,8 @@
 		const asn1 = fromBER(stringToArrayBuffer(fromBase64(stringCertPEM)));
 		const certificate = new pki.Certificate({ schema: asn1.result });
 
+		const cert_signature = certificate.signatureValue;
+		const tbs = certificate.tbs;
 
 		const publicKeyInfoSchema = certificate.subjectPublicKeyInfo.toSchema();
 		const publicKeyInfoBuffer = publicKeyInfoSchema.toBER(false);
@@ -15965,8 +15967,8 @@
 				        name: "RSASSA-PKCS1-v1_5",
 				    },
 				    publicKey, 
-				    binSig, 
-				    new Uint8Array(hash).buffer
+				    new Uint8Array(signature.valueBlock.valueHex), 
+				    new Uint8Array(tbs)
 				)
 				.then(function(isvalid){
 				    //returns a boolean on whether the signature is true or not
