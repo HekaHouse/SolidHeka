@@ -15958,7 +15958,7 @@
 		    ["verify"] 
 		)
 		.then(function(publicKey){
-			sha256(JSON.stringify(secure)).then(hash => 
+			sha256(JSON.stringify(secure)).then(hash => {
 
 			    window.crypto.subtle.verify(
 				    {
@@ -15976,7 +15976,7 @@
 				.catch(function(err){
 				    console.error(err);
 				});
-			);
+			});
 		})
 		.catch(function(err){
 		    console.error(err);
