@@ -15930,7 +15930,7 @@
 	{
 		
 		var signature = secure.signed;
-		var binSig = stringToArrayBuffer(fromBase64(signature);
+		var binSig = stringToArrayBuffer(fromBase64(signature));
 
 		delete secure.signed;
 
